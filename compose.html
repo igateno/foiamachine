@@ -34,26 +34,52 @@
   <body>
     <div class="container">
 
-      <!-- I just had an idea that this whole process can go on one scrollable
-      page that can just autoscroll itself to the next steps. -->
+      <h1>Compose your request</h1>
 
-      <div class="hero-unit">
-        <h1>Hello, FOIA Machine!</h1>
-        <p>
-          The FOIA Machine makes it easy to submit Freedom of Information
-          requests across international borders.
-        </p>
-        <form id="country" action="agency_select.html">
-          <fieldset>
-            <legend>Which country would you like to learn about?</legend>
-            <input name="country" type="text" placeholder="Mexico" required autofocus>
-            <input name="submit" type="submit" value="Go">
-          </fieldset>
-        </form>
-        <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-        <p><a href="dashboard.html" class="btn btn-primary btn-large">Sign In &raquo;</a></p>
+      <div class="row-fluid">
+        <div class="span4">
+          <h2>Burning Question</h2>
+          <p>
+            This is the critical paragraph of your request. If you just tell us
+            the question that you want to ask, we can fill in the rest of the
+            legalese for you.
+          </p>
+          <input type="textarea">
+        </div>
+        <div class="span4">
+          <h2>Time, baby, time!</h2>
+          <p>
+            Your request will be much more effective (and easier to read
+            through) if you narrow down the time range. Why don't you go ahead
+            and do that now?
+          </p>
+          <!-- google "bootstrap datepicker" -->
+          <form id="dates" action="#">
+            <fieldset>
+              From: <input name="from" type="datetime"><br/>
+              To: <input name="to" type="datetime">
+            </fieldset>
+          </form>
+       </div>
+        <div class="span4">
+          <h2>Document types</h2>
+          <p>
+            If you ask for only ask for memos, but the juicy details are in
+            emails, you might be SOL. On the other hand, if you don't care
+            about paper documents, taking them off your request might mean
+            getting answers you do want faster. Just sayin. It's up to you.
+          </p>
+          <form id="docs" action="#">
+            <ul>
+              <li><input name="emails" type="checkbox">Emails</li>
+              <li><input name="memos" type="checkbox">Memos</li>
+              <li><input name="phonerecords" type="checkbox">Phone Records</li>
+              <li><input name="meeting" type="checkbox">Meeting Minutes</li>
+            </ul>
+          </form>
+          <p><a class="btn" href="proofread.html">Next Step &raquo;</a></p>
+        </div>
       </div>
-
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
