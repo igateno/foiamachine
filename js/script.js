@@ -4,11 +4,23 @@ var FOIARouter = Backbone.Router.extend({
 
   routes: {
     '':'home',
-    'dashboard':'dashboard'
+    'login':'login',
+    'dash':'dashboard',
+    'forms':'forms',
   },
 
   initialize: function() {
-    // TODO?
+    this.headerView = new HeaderView();
+    this.headerView.render();
+    $('header').html(this.headerView.el);
+  },
+
+  login: function() {
+    if (!this.loginView) {
+      this.loginView = new LoginView();
+      this.loginView.render();
+    }
+    $('article').html(this.loginView.el);
   },
 
   home: function() {
@@ -16,7 +28,7 @@ var FOIARouter = Backbone.Router.extend({
       this.homeView = new HomeView();
       this.homeView.render();
     }
-    $('#content').html(this.homeView.el);
+    $('article').html(this.homeView.el);
   },
 
   dashboard: function() {
@@ -24,12 +36,20 @@ var FOIARouter = Backbone.Router.extend({
       this.dashView = new DashView();
       this.dashView.render();
     }
-    $('#content').html(this.dashView.el);
+    $('article').html(this.dashView.el);
+  },
+
+  forms: function(tab) {
+    if (!this.formsView) {
+      this.formsView = new FormsView();
+      this.formsView.render();
+    }
+    $('article').html(this.formsView.el);
   }
 
 });
 
-var templates = ['hellofoia', 'dashboard'];
+var templates = ['header', 'hellofoia', 'dashboard', 'login', 'forms'];
 tpl.loadTemplates(templates, function() {
   app = new FOIARouter();
   Backbone.history.start();
