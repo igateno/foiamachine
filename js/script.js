@@ -3,8 +3,8 @@
 var FOIARouter = Backbone.Router.extend({
 
   routes: {
-    '':'home',
-    'login':'login',
+    '':'login',
+    'request':'request',
     'dash':'dashboard',
     'forms':'forms',
   },
@@ -15,20 +15,25 @@ var FOIARouter = Backbone.Router.extend({
     $('header').html(this.headerView.el);
   },
 
+  loadView: function(view) {
+    view.render();
+    $('#container').html(view.el);
+  },
+
   login: function() {
     if (!this.loginView) {
       this.loginView = new LoginView();
       this.loginView.render();
     }
-    $('article').html(this.loginView.el);
+    $('#container').html(this.loginView.el);
   },
 
-  home: function() {
-    if (!this.homeView) {
-      this.homeView = new HomeView();
-      this.homeView.render();
+  request: function() {
+    if (!this.requestView) {
+      this.requestView = new RequestView();
+      this.requestView.render();
     }
-    $('article').html(this.homeView.el);
+    $('#container').html(this.requestView.el);
   },
 
   dashboard: function() {
@@ -36,7 +41,7 @@ var FOIARouter = Backbone.Router.extend({
       this.dashView = new DashView();
       this.dashView.render();
     }
-    $('article').html(this.dashView.el);
+    $('#container').html(this.dashView.el);
   },
 
   forms: function(tab) {
@@ -44,12 +49,12 @@ var FOIARouter = Backbone.Router.extend({
       this.formsView = new FormsView();
       this.formsView.render();
     }
-    $('article').html(this.formsView.el);
+    $('#container').html(this.formsView.el);
   }
 
 });
 
-var templates = ['header', 'hellofoia', 'dashboard', 'login', 'forms'];
+var templates = ['header', 'request', 'dashboard', 'login', 'forms'];
 tpl.loadTemplates(templates, function() {
   app = new FOIARouter();
   Backbone.history.start();

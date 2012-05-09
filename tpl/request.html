@@ -1,17 +1,14 @@
-<!-- I just had an idea that this whole process can go on one scrollable
-page that can just autoscroll itself to the next steps. -->
-
 <div class="hero-unit">
   <h1>Hello, FOIA Machine!</h1>
   <p>
     The FOIA Machine makes it easy to submit Freedom of Information
     requests across international borders.
   </p>
-  <form id="country" action="#goBtn">
+  <form id="country">
     <fieldset>
       <legend>Which country would you like to learn about?</legend>
       <input name="country" type="text" placeholder="Mexico" required autofocus>
-      <input name="submit" type="submit" value="Go">
+      <input id="goBtn" name="submit" type="submit" value="Go">
     </fieldset>
   </form>
   <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
