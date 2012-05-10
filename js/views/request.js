@@ -8,7 +8,8 @@ var RequestView = Backbone.View.extend({
     'click #request-countries a': 'tabs',
     'click form#request input.btn': 'load_topics',
     'click form#request input#topicBtn': 'load_countries',
-    'click form#request input#agencyBtn': 'load_question'
+    'click form#request input#agencyBtn': 'load_question',
+    'click form#request input#qBtn': 'load_datepickers'
   },
 
   render: function() {
@@ -44,6 +45,12 @@ var RequestView = Backbone.View.extend({
   load_question: function(e) {
     e.preventDefault();
     this.append_next(e, 'request-partial-3');
+  },
+
+  load_datepickers: function(e) {
+    e.preventDefault();
+    this.append_next(e, 'request-partial-4');
+    $('.datepicker').datepicker();
   }
 
 });

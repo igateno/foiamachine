@@ -60,6 +60,7 @@ var templates = [
   'request-partial-1',
   'request-partial-2',
   'request-partial-3',
+  'request-partial-4',
   'dashboard',
   'login',
   'forms'
