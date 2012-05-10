@@ -51,6 +51,7 @@ var RequestView = Backbone.View.extend({
     e.preventDefault();
     this.append_next(e, 'request-partial-4');
     $('.datepicker').datepicker();
+    $('.btn').button();
   }
 
 });
