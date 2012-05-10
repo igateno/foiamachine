@@ -54,7 +54,16 @@ var FOIARouter = Backbone.Router.extend({
 
 });
 
-var templates = ['header', 'request', 'dashboard', 'login', 'forms'];
+var templates = [
+  'header',
+  'request',
+  'request-partial-1',
+  'request-partial-2',
+  'request-partial-3',
+  'dashboard',
+  'login',
+  'forms'
+];
 tpl.loadTemplates(templates, function() {
   app = new FOIARouter();
   Backbone.history.start();

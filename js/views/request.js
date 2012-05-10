@@ -5,7 +5,10 @@ var RequestView = Backbone.View.extend({
   },
 
   events: {
-    'click form#country input#goBtn': 'goBtn'
+    'click #request-countries a': 'tabs',
+    'click form#request input.btn': 'load_topics',
+    'click form#request input#topicBtn': 'load_countries',
+    'click form#request input#agencyBtn': 'load_question'
   },
 
   render: function() {
@@ -13,10 +16,34 @@ var RequestView = Backbone.View.extend({
     return this;
   },
 
-  goBtn: function(e) {
+  tabs: function(e) {
     e.preventDefault();
-    $('form#country fieldset').append('<div>Hello, world!</div>');
+    $(this).tab('show');
+  },
+
+  append_next: function(e, tpl_key) {
     $(e.target).detach();
+    var template = _.template(tpl.get(tpl_key));
+    $('form#request fieldset').append(template);
+  },
+
+  load_topics: function(e) {
+    e.preventDefault();
+    // should check for input and fire an alert if no input
+    this.append_next(e, 'request-partial-1');
+    $('form#country #topic input').typeahead({
+      'source': ['Drug War', 'Immigration', 'Sombreros']
+    });
+  },
+
+  load_countries: function(e) {
+    e.preventDefault();
+    this.append_next(e, 'request-partial-2');
+  },
+
+  load_question: function(e) {
+    e.preventDefault();
+    this.append_next(e, 'request-partial-3');
   }
 
 });
