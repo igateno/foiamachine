@@ -17,3 +17,4 @@ to install lighttpd and enable fastCGI
 - copy or symlink etc/lighttpd.conf in place of the default lighttpd.conf
 - sudo apt-get install mysql-client mysql-server
 - run migrations in ./db
+- sudo apt-get install php5-mysql

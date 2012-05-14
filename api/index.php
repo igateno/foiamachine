@@ -1,5 +1,5 @@
 <?php
-  require 'Slim/Slim.php';
+  require 'Slim/Slim/Slim.php';
 
   $app = new Slim();
   $app->get('/entities', 'getEntities');
@@ -21,7 +21,7 @@
         $db = null;
         echo json_encode($entities);
      }catch(PDOException $e){
-        echo '{"error":{"text":'.$e.getMessage().'}}';
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
@@ -106,7 +106,7 @@
      }catch (PDOException $e){
         echo '{"error":{"text".$e.getMessage().'}}';
      }
-  }
+  } */
 
   function getConnection(){
      $dbhost = "mysql-user-master.stanford.edu";
@@ -117,6 +117,6 @@
           $dbpassphrase);
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      return $dbh;
-  } */
+  }
 
 ?>
