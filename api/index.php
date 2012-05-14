@@ -109,10 +109,10 @@
   } */
 
   function getConnection(){
-     $dbhost = "mysql-user-master.stanford.edu";
-     $dbuser = "ccs108drpaudel";
-     $dbpassphrase = "zaevahzu";
-     $dbname = "c_cs108_drpaudel";
+     $dbhost = "localhost";
+     $dbuser = "foia";
+     $dbpassphrase = "foiamachine";
+     $dbname = "foia";
      $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser,
           $dbpassphrase);
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

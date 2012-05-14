@@ -2,7 +2,7 @@ var EntityListView = Backbone.View.extend({
 
   render: function() {
     var f = function() {
-      var item = new EntityItemView({model:entity});
+      var item = new EntityItemView({model:Entity});
       item.render();
       $(this.el).append(item.el);
     };
