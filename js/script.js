@@ -50,6 +50,10 @@ var FOIARouter = Backbone.Router.extend({
       this.formsView.render();
     }
     $('#container').html(this.formsView.el);
+    this.elist = new EntityCollection();
+    this.elistView = new EntityListView({model:this.elist});
+    this.elist.fetch();
+    $('#entity-list').html(this.elistView.render().el);
   }
 
 });
@@ -63,7 +67,8 @@ var templates = [
   'request-partial-4',
   'dashboard',
   'login',
-  'forms'
+  'forms',
+  'entity-item'
 ];
 tpl.loadTemplates(templates, function() {
   app = new FOIARouter();
