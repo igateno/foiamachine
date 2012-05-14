@@ -1,6 +1,6 @@
 <?php
   require 'Slim/Slim.php';
-  
+
   $app = new Slim();
   $app->get('/entities', 'getEntities');
   $app->get('/entities/:id', 'getEntity');
@@ -25,7 +25,7 @@
      }
   }
 
-  function getEntity($id){
+  /* function getEntity($id){
      $sql = "select * from entities where id=:id";
      try{
         $db = getConnection();
@@ -63,7 +63,7 @@
 
   function updateEntity(){
      $request = Slim::getInstance()->request();
-     $entity = jsonEncode($request->getBody()); 
+     $entity = jsonEncode($request->getBody());
      $sql = "update entities set name=:name, type=:type where id=:id";
      try{
         $db = getConnection();
@@ -117,6 +117,6 @@
           $dbpassphrase);
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      return $dbh;
-  }
+  } */
 
 ?>

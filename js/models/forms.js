@@ -1,4 +1,4 @@
-var Entity = Backbone.Model.Extend({
+var Entity = Backbone.Model.extend({
 
   urlRoot: "api/entities"
 
@@ -10,4 +10,4 @@ var EntityCollection = Backbone.Collection.extend({
 
   url:"api/entities"
 
-})l
+});
