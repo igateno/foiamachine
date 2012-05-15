@@ -51,9 +51,13 @@ var FOIARouter = Backbone.Router.extend({
     }
     $('#container').html(this.formsView.el);
     this.elist = new EntityCollection();
-    this.elistView = new EntityListView({model:this.elist});
-    this.elist.fetch();
-    $('#entity-list').html(this.elistView.render().el);
+    var that = this;
+    this.elist.fetch({
+      success: function(collection) {
+        var elistView = new EntityListView({model: collection});
+        $('#entity-list').html(elistView.render().el);
+      }
+    });
   }
 
 });

@@ -12,8 +12,7 @@
   $app->run();
 
   function getEntities(){
-     echo 'getting entities';
-     $sql = "select * from entities order by name";
+     $sql = "select * from entities";
      try{
         $db = getConnection();
         $stmt = $db->query($sql);

@@ -1,12 +1,11 @@
 var EntityListView = Backbone.View.extend({
 
   render: function() {
-    var f = function() {
-      var item = new EntityItemView({model:Entity});
+    _.each(this.model.models, function(element, index, list) {
+      var item = new EntityItemView({model:element});
       item.render();
       $(this.el).append(item.el);
-    };
-    _.each(this.model.models, f, this);
+    }, this);
     return this;
   }
 
@@ -19,7 +18,8 @@ var EntityItemView = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(this.model.toJSON());
+    $(this.el).html(this.template(this.model.toJSON()));
+    return this;
   }
 
 });
