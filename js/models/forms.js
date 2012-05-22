@@ -1,4 +1,17 @@
-var Entity = Backbone.Model.extend();
+var Entity = Backbone.Model.extend({
+
+  url:'api/entities',
+
+  initialize: function() {
+    console.log('new entity model created');
+  },
+
+  defaults: {
+    name: '',
+    type: 0
+  }
+
+});
 
 var EntityCollection = Backbone.Collection.extend({
 

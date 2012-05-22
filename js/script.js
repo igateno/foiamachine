@@ -6,7 +6,7 @@ var FOIARouter = Backbone.Router.extend({
     '':'login',
     'request':'request',
     'dash':'dashboard',
-    'forms':'forms',
+    'forms':'countryForm',
   },
 
   initialize: function() {
@@ -44,6 +44,15 @@ var FOIARouter = Backbone.Router.extend({
     $('#container').html(this.dashView.el);
   },
 
+  countryForm: function() {
+    if (!this.countryFormView) {
+      var country = new Entity();
+      this.countryFormView = new CountryFormView({model:country});
+      this.countryFormView.render();
+    }
+    $('#container').html(this.countryFormView.el);
+  },
+
   forms: function(tab) {
     if (!this.formsView) {
       this.formsView = new FormsView();
@@ -78,6 +87,7 @@ var templates = [
   'dashboard',
   'login',
   'forms',
+  'country-form',
   'entity-item',
   'relation-item'
 ];
