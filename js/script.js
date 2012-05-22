@@ -51,11 +51,17 @@ var FOIARouter = Backbone.Router.extend({
     }
     $('#container').html(this.formsView.el);
     this.elist = new EntityCollection();
-    var that = this;
     this.elist.fetch({
       success: function(collection) {
         var elistView = new EntityListView({model: collection});
         $('#entity-list').html(elistView.render().el);
+      }
+    });
+    this.rlist = new RelationCollection();
+    this.rlist.fetch({
+      success: function(collection) {
+        var rlistView = new RelationListView({model: collection});
+        $('#relation-list').html(rlistView.render().el);
       }
     });
   }
@@ -72,7 +78,8 @@ var templates = [
   'dashboard',
   'login',
   'forms',
-  'entity-item'
+  'entity-item',
+  'relation-item'
 ];
 tpl.loadTemplates(templates, function() {
   app = new FOIARouter();

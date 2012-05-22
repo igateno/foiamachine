@@ -7,3 +7,13 @@ var EntityCollection = Backbone.Collection.extend({
   url:"api/entities"
 
 });
+
+var Relation = Backbone.Model.extend();
+
+var RelationCollection = Backbone.Collection.extend({
+
+  model: Relation,
+
+  url:"api/relations"
+
+});

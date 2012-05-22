@@ -113,7 +113,7 @@
   }
 
   function getRelations(){
-     $sql = "select e1.name, r.type, e2.name " .
+     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
        "from entities as e1, entities as e2, relations as r " .
        "where e1.id = r.id1 and e2.id = r.id2;";
      try{
