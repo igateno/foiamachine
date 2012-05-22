@@ -8,11 +8,10 @@
   $app->post('/entities', 'addEntity');
   $app->post('/entities/:id', 'updateEntity');
   $app->post('/entities/:id', 'deleteEntity');
-
   $app->run();
 
   function getEntities(){
-     $sql = "select * from entities";
+     $sql = "select * from entities order by name";
      try{
         $db = getConnection();
         $stmt = $db->query($sql);
@@ -20,11 +19,11 @@
         $db = null;
         echo json_encode($entities);
      }catch(PDOException $e){
-        echo '{"error":{"text":'.$e->getMessage().'}}';
+        echo '{"error":{"text":'.$e.getMessage().'}}';
      }
   }
 
-  /* function getEntity($id){
+  function getEntity($id){
      $sql = "select * from entities where id=:id";
      try{
         $db = getConnection();
@@ -42,8 +41,8 @@
   function addEntity(){
      error_log('addEntity\n', 3, '/var/tmp/php.log');
      $request = Slim::getInstance()->request();
-     $entity = json_encode($request->getBody());
-     $sql = "insert into entities (name, type) values(:name, :type)";
+     $entity = json_decode($request->getBody());
+    $sql = "insert into entities (name, type) values(:name, :type)";
      try{
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -51,7 +50,7 @@
         $stmt->bindParam("type", $entity->type);
         $stmt->execute();
         $entity = $stmt->fetchObject();
-        $entity->id = $db->lastInsertId();
+        $entity->id = $db->last_insert_id();
         $db = null;
         echo json_encode($entity);
      }catch(PDOException $e){
@@ -87,7 +86,7 @@
         $stmt->execute();
         $db = null;
      }catch (PDOException $e){
-        echo '{"error":{"text".$e.getMessage().'}}';
+        echo '{"error":{"text"'.$e.getMessage().'}}';
      }
   }
 
@@ -103,9 +102,9 @@
         $db = null;
         echo json_encode($entities);
      }catch (PDOException $e){
-        echo '{"error":{"text".$e.getMessage().'}}';
+        echo '{"error":{"text"'.$e.getMessage().'}}';
      }
-  } */
+  }
 
   function getConnection(){
      $dbhost = "localhost";
@@ -117,5 +116,4 @@
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      return $dbh;
   }
-
 ?>
