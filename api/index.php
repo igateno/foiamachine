@@ -2,12 +2,18 @@
   require 'Slim/Slim/Slim.php';
 
   $app = new Slim();
+
+  // Entities
   $app->get('/entities', 'getEntities');
   $app->get('/entities/:id', 'getEntity');
   $app->get('/entities/search/:query', 'findByName');
   $app->post('/entities', 'addEntity');
   $app->post('/entities/:id', 'updateEntity');
   $app->post('/entities/:id', 'deleteEntity');
+
+  // Relations
+  $app->get('/relations', 'getRelations');
+
   $app->run();
 
   function getEntities(){
@@ -103,6 +109,21 @@
         echo json_encode($entities);
      }catch (PDOException $e){
         echo '{"error":{"text"'.$e.getMessage().'}}';
+     }
+  }
+
+  function getRelations(){
+     $sql = "select e1.name, r.type, e2.name " .
+       "from entities as e1, entities as e2, relations as r " .
+       "where e1.id = r.id1 and e2.id = r.id2;";
+     try{
+        $db = getConnection();
+        $stmt = $db->query($sql);
+        $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        echo json_encode($relations);
+     }catch(PDOException $e){
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
