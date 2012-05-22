@@ -3,6 +3,9 @@
 
   $app = new Slim();
 
+  // Auth
+  $app->post('/auth', 'login');
+
   // Entities
   $app->get('/entities', 'getEntities');
   $app->get('/entities/:id', 'getEntity');
@@ -15,6 +18,10 @@
   $app->get('/relations', 'getRelations');
 
   $app->run();
+
+  function login(){
+    // TODO
+  }
 
   function getEntities(){
      $sql = "select * from entities order by name";
