@@ -23,9 +23,7 @@ var CountryFormView = Backbone.View.extend({
     });
     this.model.save(null, {
       success: function(model) {
-        // TODO this should remove the current form and
-        // replace it with a new one
-        // Then it should render the entities
+        self.model = new Entity();
         self.render();
         $('#feedback').html('Success!');
       },
