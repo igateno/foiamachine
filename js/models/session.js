@@ -5,27 +5,22 @@
 
 var Session = Backbone.Model.extend({
 
-  url; "api/auth",
+  url: "api/auth",
 
   defaults: {
-    "id": null,
-    "token": null
+    username: '',
+    password: '',
+    token: ''
   },
 
   authenticated: function () {
-    return model.get('token') ? true : false;
+    return this.get('token').length > 0 ? true : false;
   },
 
-  save: function (id, token) {
-    $.cookie('id', id);
-    $.cookie('token', token);
-  },
-
-  load: function () {
-    model.set({
-      id: $.cookie('id');
-      token: $.cookie('token');
-    });
+  login: function() {
+    this.save();
+    this.set({password:''});
+    // invoke callbacks
   }
 
 });

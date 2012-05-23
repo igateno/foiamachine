@@ -35,7 +35,8 @@ create table `foia`.`requests` (
 create table `foia`.`users` (
   `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR (20) NOT NULL,
-  `password` CHAR (40) NOT NULL,
-  `email` VARCHAR (100) NOT NULL,
+  `email` VARCHAR (100),
+  `hash` CHAR (64) NOT NULL,
+  `salt` CHAR (64) NOT NULL,
   `type` INTEGER UNSIGNED NOT NULL
 ) engine = InnoDB;

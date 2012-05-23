@@ -15,14 +15,10 @@ var FOIARouter = Backbone.Router.extend({
     $('header').html(this.headerView.el);
   },
 
-  loadView: function(view) {
-    view.render();
-    $('#container').html(view.el);
-  },
-
   login: function() {
     if (!this.loginView) {
-      this.loginView = new LoginView();
+      var session = new Session();
+      this.loginView = new LoginView({model:session});
       this.loginView.render();
     }
     $('#container').html(this.loginView.el);

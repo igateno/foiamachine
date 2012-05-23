@@ -5,6 +5,7 @@
 
   // Auth
   $app->post('/auth', 'login');
+  // $app->port('/auth/:token', 'authenticate');
 
   // Entities
   $app->get('/entities', 'getEntities');
@@ -20,7 +21,28 @@
   $app->run();
 
   function login(){
-    // TODO
+    $request = Slim::getInstance()->request();
+    $login = json_decode($request->getBody());
+    $sql = "select id, hash, salt from users where name=:username";
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("username",$login->username);
+      $stmt->execute();
+      $auth = $stmt->fetchObject();
+      $db = null;
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+      return;
+    }
+
+    $user_hash = hash('sha256', $login->password.$auth->salt);
+    if (strcmp($user_hash, $auth->hash)) {
+      echo '{"token":""}';
+    } else {
+      $token = hash('sha256', $auth->id.$auth->salt.date("z"));
+      echo '{"token":"'.$token.'"}';
+    }
   }
 
   function getEntities(){
@@ -32,7 +54,7 @@
         $db = null;
         echo json_encode($entities);
      }catch(PDOException $e){
-        echo '{"error":{"text":'.$e.getMessage().'}}';
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
@@ -47,7 +69,7 @@
         $db = null;
         echo json_encode($entity);
      }catch(PDOException $e){
-        echo '{"error":{"text":'.$e.getMessage().'}}';
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
@@ -68,7 +90,7 @@
         echo json_encode($entity);
      }catch(PDOException $e){
         error_log($e->getMessage(), 3, '/var/tmp/php.log');
-        echo '{"error":{"text":'.$e.getMessage().'}}';
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
@@ -86,7 +108,7 @@
         $db = null;
         echo json_encode($entity);
      }catch(PDOException $e){
-        echo '{"error":{"text":'.$e.getMessage().'}}';
+        echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
@@ -99,7 +121,7 @@
         $stmt->execute();
         $db = null;
      }catch (PDOException $e){
-        echo '{"error":{"text"'.$e.getMessage().'}}';
+        echo '{"error":{"text"'.$e->getMessage().'}}';
      }
   }
 
@@ -115,7 +137,7 @@
         $db = null;
         echo json_encode($entities);
      }catch (PDOException $e){
-        echo '{"error":{"text"'.$e.getMessage().'}}';
+        echo '{"error":{"text"'.$e->getMessage().'}}';
      }
   }
 
@@ -144,4 +166,32 @@
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      return $dbh;
   }
+
+  // WARNING!
+  // This function exists solely for testing purposes
+  // Code with this functon uncommented should never be commited
+  // under any circumstances. In fact, TODO make this function
+  // dissapear ASAP and replace with a production ready way to
+  // add users
+  /*function addUser($name, $pass) {
+    $salt = hash('sha256', uniqid(mt_rand(),true));
+    $hash = hash('sha256', $pass.$salt);
+    $sql = "insert into users (name, hash, salt, type)".
+           "values (:name, :hash, :salt, 1)";
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("name", $name);
+      $stmt->bindParam("hash", $hash);
+      $stmt->bindParam("salt", $salt);
+      $stmt->execute();
+      $auth = $stmt->fetchObject();
+      $auth->id = $db->last_insert_id();
+      $db = null;
+      echo json_encode($auth);
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }*/
+
 ?>
