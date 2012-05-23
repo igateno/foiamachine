@@ -5,7 +5,6 @@
 
   // Auth
   $app->post('/auth', 'login');
-  // $app->port('/auth/:token', 'authenticate');
 
   // Entities
   $app->get('/entities', 'getEntities');

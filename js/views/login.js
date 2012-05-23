@@ -5,7 +5,8 @@ var LoginView = Backbone.View.extend({
   },
 
   events: {
-    'click #div-login a.login': 'login'
+    'click #div-login a.login': 'login',
+    'keypress #password input': 'loginEnter'
   },
 
   render: function() {
@@ -24,7 +25,20 @@ var LoginView = Backbone.View.extend({
       username: $('#username input').val(),
       password: $('#password input').val()
     });
-    this.model.login();
+    this.model.login({
+      good: function() {
+        // TODO take user to request flow
+        console.log('called success callback');
+      },
+      bad: function() {
+        // TODO clear password input and give feedback
+        console.log('called error callback');
+      }
+    });
+  },
+
+  loginEnter: function(e) {
+    if (e.keyCode == 13) this.login(e);
   }
 
 });

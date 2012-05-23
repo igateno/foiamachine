@@ -13,14 +13,26 @@ var Session = Backbone.Model.extend({
     token: ''
   },
 
-  authenticated: function () {
-    return this.get('token').length > 0 ? true : false;
-  },
-
-  login: function() {
-    this.save();
-    this.set({password:''});
-    // invoke callbacks
+  login: function(callbacks) {
+    var self = this;
+    this.save(null, {
+      success: function(model, response) {
+        self.set({
+          password: '',
+          token: response.token
+        });
+        if (response.token.length > 0) {
+          $.cookie('token', response.token);
+          callbacks.good();
+        } else {
+          callbacks.bad();
+        }
+      },
+      error: function(model, response) {
+        // TODO for actual error
+        self.set({password: ''});
+      }
+    });
   }
 
 });
