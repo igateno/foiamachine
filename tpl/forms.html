@@ -1,13 +1,27 @@
 <div id="entity-inserts" class="span3">
 
+  <div id="alert-container">
+    <span id="feedback"></span>
+  </div>
+
   <div id="new-country-container">
+  </div>
+
+  <div id="new-agency-container">
   </div>
 
 </div>
 
+<!-- Alert on success or error -->
+<script id="alert-template" type="text-template">
+  <div class="alert">
+    <button class="close" data-dismiss="alert">x</button>
+    <span class="message"></span>
+  </div> <!-- alert -->
+</script>
+
 <!-- Form to insert a new country -->
 <script id="new-country-template" type="text/template">
-  <span id="feedback"></span>
   <form id="new-country">
     <fieldset>
       <legend>New Country</legend>
@@ -21,4 +35,21 @@
       <a id="add-country" class="btn">Add Country</a>
     </div>
   </form> <!-- new-country -->
+</script>
+
+<!-- Form to insert a new agency -->
+<script id="new-agency-template" type="text/template">
+  <form id="new-agency">
+    <fieldset>
+      <legend>New Agency</legend>
+      <div>
+        <label for="name">Name:</label>
+        <input id="name" type="text" name="name">
+      </div>
+    </fieldset>
+
+    <div>
+      <a id="add-agency" class="btn">Add Agency</a>
+    </div>
+  </form> <!-- new-agency -->
 </script>
