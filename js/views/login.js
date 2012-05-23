@@ -14,25 +14,44 @@ var LoginView = Backbone.View.extend({
     return this
   },
 
+  alert: function(success, message) {
+    var alertView = new Backbone.View();
+    alertView.template = _.template($('#alert-template').html());
+    $(alertView.el).html(alertView.template());
+
+    if (success) {
+      alertView.$('.alert').addClass('alert-success');
+    } else {
+      alertView.$('.alert').addClass('alert-error');
+    }
+    alertView.$('.message').html(message);
+
+    $('#alert-container').html(alertView.el);
+  },
+
   login: function(e) {
     e.preventDefault();
 
-    // TODO give user feeback
-    if ($('#username input').val().length == 0) return;
-    if ($('#password input').val().length == 0) return;
+    if ($('#username input').val().length == 0) {
+      this.alert(false, 'Username cannot be blank.');
+      return;
+    }
+    if ($('#password input').val().length == 0) {
+      this.alert(false, 'Password cannot be blank.');
+      return;
+    }
 
     this.model.set({
       username: $('#username input').val(),
       password: $('#password input').val()
     });
+    var self = this;
     this.model.login({
       good: function() {
-        // TODO take user to request flow
-        console.log('called success callback');
+        self.alert(true, 'You logged in!');
       },
       bad: function() {
-        // TODO clear password input and give feedback
-        console.log('called error callback');
+        self.alert(false, 'Username and/or password incorrect');
       }
     });
   },

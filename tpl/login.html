@@ -1,5 +1,7 @@
 <div class="span12" id="div-login">
   <h1>The FOIA Machine is under construction</h1>
+  <div id="alert-container">
+  </div>
   <form id="form-login" action="#request">
     <fieldset>
       <legend>Please sign in</legend>
@@ -19,3 +21,11 @@
 
   <form> <!-- login -->
 </div> <!-- signin-form -->
+
+<!-- feedback alert -->
+<script id="alert-template" type="text/template">
+  <div class="alert">
+    <button class="close" data-dismiss="alert">x</button>
+    <span class="message"></span>
+  </div>
+</script>
