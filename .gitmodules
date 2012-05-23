@@ -4,3 +4,6 @@
 [submodule "js/libs/jquery-cookie"]
 	path = js/libs/jquery-cookie
 	url = https://github.com/carhartl/jquery-cookie.git
+[submodule "js/libs/json"]
+	path = js/libs/json
+	url = https://github.com/douglascrockford/JSON-js.git
