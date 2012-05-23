@@ -1,7 +1,7 @@
 var CountryFormView = Backbone.View.extend({
 
   initialize: function() {
-    this.template = _.template(tpl.get('country-form'));
+    this.template = _.template($('#new-country-template').html());
   },
 
   events: {
@@ -45,6 +45,27 @@ var FormsView = Backbone.View.extend({
     this.template = _.template(tpl.get('forms'));
   },
 
+  render: function() {
+    $(this.el).html(this.template());
+    return this;
+  },
+
+  populate: function() {
+    if (!this.countryFormView) {
+      var country = new Entity();
+      this.countryFormView = new CountryFormView({model:country});
+    }
+    $('#new-country-container').html(this.countryFormView.render().el);
+  },
+
+});
+
+/*var FormsView = Backbone.View.extend({
+
+  initialize: function() {
+    this.template = _.template(tpl.get('forms'));
+  },
+
   events: {
     "click #feedback a": "tabs",
     "click #save_new_country": "saveNewCountry"
@@ -65,4 +86,4 @@ var FormsView = Backbone.View.extend({
     console.log("Saving new country...");
   }
 
-});
+});*/

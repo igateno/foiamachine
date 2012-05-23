@@ -6,7 +6,7 @@ var FOIARouter = Backbone.Router.extend({
     '':'login',
     'request':'request',
     'dash':'dashboard',
-    'forms':'countryForm',
+    'forms':'forms',
   },
 
   initialize: function() {
@@ -44,22 +44,14 @@ var FOIARouter = Backbone.Router.extend({
     $('#container').html(this.dashView.el);
   },
 
-  countryForm: function() {
-    if (!this.countryFormView) {
-      var country = new Entity();
-      this.countryFormView = new CountryFormView({model:country});
-      this.countryFormView.render();
-    }
-    $('#container').html(this.countryFormView.el);
-  },
-
   forms: function(tab) {
     if (!this.formsView) {
       this.formsView = new FormsView();
       this.formsView.render();
     }
     $('#container').html(this.formsView.el);
-    this.elist = new EntityCollection();
+    this.formsView.populate();
+    /*this.elist = new EntityCollection();
     this.elist.fetch({
       success: function(collection) {
         var elistView = new EntityListView({model: collection});
@@ -72,7 +64,7 @@ var FOIARouter = Backbone.Router.extend({
         var rlistView = new RelationListView({model: collection});
         $('#relation-list').html(rlistView.render().el);
       }
-    });
+    });*/
   }
 
 });
@@ -87,7 +79,6 @@ var templates = [
   'dashboard',
   'login',
   'forms',
-  'country-form',
   'entity-item',
   'relation-item'
 ];
