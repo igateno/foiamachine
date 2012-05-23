@@ -1,125 +1,43 @@
-<!-- Form to insert a new country -->
 <div id="entity-inserts" class="span3">
-  <form id="new-country" action="#forms">
+
+  <div id="alert-container">
+    <span id="feedback"></span>
+  </div>
+
+  <div id="new-country">
+    <h2>New Country</h2>
+  </div>
+
+  <div id="new-agency">
+    <h2>New Agency</h2>
+  </div>
+
+  <div id="new-topic">
+    <h2>New Topic</h2>
+  </div>
+
+</div>
+
+<!-- Alert on success or error -->
+<script id="alert-template" type="text-template">
+  <div class="alert">
+    <button class="close" data-dismiss="alert">x</button>
+    <span class="message"></span>
+  </div> <!-- alert -->
+</script>
+
+<!-- Form to insert a new entity -->
+<script id="new-entity-template" type="text/template">
+  <form class="new-entity">
     <fieldset>
-      <legend>New Country</legend>
       <div>
-        <input type="hidden" name="type" value="1">
         <label for="name">Name:</label>
-        <input type="text" name="name">
-      </div>
-      <div>
-        <input type="submit" value="Add Country">
+        <input class="name" type="text" name="name">
       </div>
     </fieldset>
-  </form> <!-- new-country -->
 
-  <!-- Form to insert a new agency -->
-  <form id="new-agency" action="#forms">
-    <fieldset>
-      <legend>New Agency</legend>
-      <div>
-        <input type="hidden" name="type" value="2">
-        <label for="name">Name:</label>
-        <input type="text" name="name">
-      </div>
-      <div>
-        <input type="submit" value="Add Agency">
-      </div>
-    </fieldset>
-  </form> <!-- new-agency -->
-
-  <!-- Form to insert a new topic -->
-  <form id="new-topic" action="#forms">
-    <fieldset>
-      <legend>New Topic</legend>
-      <div>
-        <input type="hidden" name="type" value="3">
-        <label for="name">Name:</label>
-        <input type="text" name="name">
-      </div>
-      <div>
-        <input type="submit" value="Add Topic">
-      </div>
-    </fieldset>
-  </form> <!-- new-topic -->
-</div> <!-- entity-inserts -->
-
-<div id="relation-inserts" class="span3">
-  <form id="new-country-country" action="#forms">
-    <fieldset>
-      <legend>Country-Country</legend>
-      <div>
-        <select name="id1">
-          <option value="" selected>United States</option>
-          <option values="">Russia</option>
-        </select>
-      </div>
-      <div><p>knows about</p></div>
-      <div>
-        <select name="id2">
-          <option value="" selected>United States</option>
-          <option values="">Russia</option>
-        </select>
-      </div>
-      <div>
-        <input type="submit" value="Add Country-Country">
-      </div>
-    </fieldset>
-  </form> <!-- new-country-country -->
-
-  <form id="new-country-agency-topic" action="#forms">
-    <fieldset>
-      <legend>Country-Agency-Topic</legend>
-      <div>
-        <select name="country">
-          <option value="" selected>United States</option>
-          <option value="">Russia</option>
-        </select>
-      </div>
-      <div>
-        <select name="agency">
-          <option value="" selected>CIA</option>
-          <option values="">KGB</option>
-        </select>
-      </div>
-      <div>
-        <select name="topic">
-          <option value="" selected>Intelligence</option>
-          <option values="">Cold War</option>
-        </select>
-      </div>
-      <div>
-        <input type="submit" value="Add Country-Agency-Topic">
-      </div>
-    </fieldset>
-  </form> <!-- new-country-agency-topic -->
-</div> <!-- relation-inserts -->
-
-<div id="db-query-results" class="span6">
-  <ul id="feedback" class="nav nav-tabs">
-    <li class="active">
-      <a href="#forms" data-target="#entities" data-toggle="tab">Entities</a>
-    </li>
-    <li>
-      <a href="#forms" data-target="#relations" data-toggle="tab">Relations</a>
-    </li>
-  </ul>
-
-  <div class="tab-content">
-
-    <div id="entities" class="tab-pane active">
-      <h1>Entities</h1>
-      <div id="entity-list">
-      </div> <!-- entity-list -->
-    </div> <!-- entities -->
-
-    <div id="relations" class="tab-pane">
-      <h1>Relations</h1>
-      <div id="relation-list">
-      </div> <!-- relation-list -->
-    </div> <!-- relations -->
-
-  </div> <!-- tab-content -->
-
-</div> <!-- db-query-results -->
+    <div>
+      <a class="btn add-entity">Add</a>
+    </div>
+  </form>
+</script>

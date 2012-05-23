@@ -1,4 +1,14 @@
-var Entity = Backbone.Model.extend();
+var Entity = Backbone.Model.extend({
+
+  url:'api/entities',
+
+  defaults: {
+    name: '',
+    type: 0,
+    type_string: ''
+  }
+
+});
 
 var EntityCollection = Backbone.Collection.extend({
 

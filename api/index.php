@@ -74,7 +74,7 @@
   }
 
   function addEntity(){
-     error_log('addEntity\n', 3, '/var/tmp/php.log');
+     error_log('addEntity'."\n", 3, '/var/tmp/php.log');
      $request = Slim::getInstance()->request();
      $entity = json_decode($request->getBody());
     $sql = "insert into entities (name, type) values(:name, :type)";
@@ -84,12 +84,11 @@
         $stmt->bindParam("name", $entity->name);
         $stmt->bindParam("type", $entity->type);
         $stmt->execute();
-        $entity = $stmt->fetchObject();
-        $entity->id = $db->last_insert_id();
+        $entity->id = $db->lastInsertId();
         $db = null;
         echo json_encode($entity);
      }catch(PDOException $e){
-        error_log($e->getMessage(), 3, '/var/tmp/php.log');
+        error_log($e->getMessage()."\n", 3, '/var/tmp/php.log');
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
