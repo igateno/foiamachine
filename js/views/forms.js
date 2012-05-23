@@ -16,6 +16,10 @@ var CountryFormView = Backbone.View.extend({
 
   addCountry: function(e) {
     e.preventDefault();
+
+    if ($('#new-country #name').val().length == 0)
+      return;
+
     var self = this;
     this.model.set({
       name: $('#new-country #name').val(),
@@ -57,6 +61,10 @@ var AgencyFormView = Backbone.View.extend({
 
   addAgency: function(e) {
     e.preventDefault();
+
+    if ($('#new-agency #name').val().length == 0)
+      return;
+
     var self = this;
     this.model.set({
       name: $('#new-agency #name').val(),
