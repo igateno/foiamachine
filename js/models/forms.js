@@ -4,7 +4,8 @@ var Entity = Backbone.Model.extend({
 
   defaults: {
     name: '',
-    type: 0
+    type: 0,
+    type_string: ''
   }
 
 });

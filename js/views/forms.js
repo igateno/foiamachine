@@ -1,12 +1,12 @@
-var CountryFormView = Backbone.View.extend({
+var EntityFormView = Backbone.View.extend({
 
   initialize: function() {
-    this.template = _.template($('#new-country-template').html());
+    this.template = _.template($('#new-entity-template').html());
   },
 
   events: {
-    'click #add-country': 'addCountry',
-    'keypress #new-country #name': 'countryEnter'
+    'click a.add-entity': 'addCountry',
+    'keypress input.name': 'countryEnter'
   },
 
   render: function() {
@@ -17,13 +17,12 @@ var CountryFormView = Backbone.View.extend({
   addCountry: function(e) {
     e.preventDefault();
 
-    if ($('#new-country #name').val().length == 0)
+    if (this.$('input.name').val().length == 0)
       return;
 
     var self = this;
     this.model.set({
-      name: $('#new-country #name').val(),
-      type: 1
+      name: this.$('input.name').val(),
     });
     this.model.save(null, {
       success: function(model) {
@@ -32,58 +31,13 @@ var CountryFormView = Backbone.View.extend({
         $('#feedback').html('Success!');
       },
       error: function() {
-        $('#feedback').html('error');
+        $('#feedback').html('Error adding entity.');
       }
     });
   },
 
   countryEnter: function(e) {
     if (e.keyCode == 13) this.addCountry(e);
-  }
-
-});
-
-var AgencyFormView = Backbone.View.extend({
-
-  initialize: function() {
-    this.template = _.template($('#new-agency-template').html());
-  },
-
-  events: {
-    'click #add-agency': 'addAgency',
-    'keypress #new-agency #name': 'agencyEnter'
-  },
-
-  render: function() {
-    $(this.el).html(this.template());
-    return this;
-  },
-
-  addAgency: function(e) {
-    e.preventDefault();
-
-    if ($('#new-agency #name').val().length == 0)
-      return;
-
-    var self = this;
-    this.model.set({
-      name: $('#new-agency #name').val(),
-      type: 2
-    });
-    this.model.save(null, {
-      success: function(model) {
-        self.model = new Entity();
-        self.render();
-        $('#feedback').html('Success!');
-      },
-      error: function() {
-        $('#feedback').html('error');
-      }
-    });
-  },
-
-  agencyEnter: function(e) {
-    if (e.keyCode == 13) this.addAgency(e);
   }
 
 });
@@ -101,15 +55,20 @@ var FormsView = Backbone.View.extend({
 
   populate: function() {
     if (!this.countryFormView) {
-      var country = new Entity();
-      this.countryFormView = new CountryFormView({model:country});
+      var country = new Entity({type: 1});
+      this.countryFormView = new EntityFormView({model:country});
     }
-    $('#new-country-container').html(this.countryFormView.render().el);
+    $('#new-country').append(this.countryFormView.render().el);
     if (!this.agencyFormView) {
-      var agency = new Entity();
-      this.agencyFormView = new AgencyFormView({model:agency});
+      var agency = new Entity({type: 2});
+      this.agencyFormView = new EntityFormView({model:agency});
     }
-    $('#new-agency-container').html(this.agencyFormView.render().el);
+    $('#new-agency').append(this.agencyFormView.render().el);
+    if (!this.topicFormView) {
+      var topic = new Entity({type: 3});
+      this.topicFormView = new EntityFormView({model:topic});
+    }
+    $('#new-topic').append(this.topicFormView.render().el);
   },
 
 });
