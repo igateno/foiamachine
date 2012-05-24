@@ -5,6 +5,7 @@ var Entity = Backbone.Model.extend({
   defaults: {
     name: '',
     type: 0,
+    username: $.cookie('username'),
     token: $.cookie('token')
   }
 

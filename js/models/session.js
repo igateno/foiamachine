@@ -1,8 +1,3 @@
-/*
- * This code draws inspiration from the article at
- * blog.opperator.com/post/15671431847/backbone-js-sessions-and-authentication
- */
-
 var Session = Backbone.Model.extend({
 
   url: "api/auth",
@@ -22,6 +17,7 @@ var Session = Backbone.Model.extend({
           token: response.token
         });
         if (response.token.length > 0) {
+          $.cookie('username', response.username);
           $.cookie('token', response.token);
           callbacks.good();
         } else {

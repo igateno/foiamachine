@@ -19,28 +19,56 @@
 
   $app->run();
 
+  function userLookup($name) {
+    $sql = "select id, hash, salt from users where name=:username";
+    $db = getConnection();
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam("username",$name);
+    $stmt->execute();
+    $auth = $stmt->fetchObject();
+    $db = null;
+
+    return $auth;
+  }
+
+  function validToken() {
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    try {
+      $rslt = userLookup($params->username);
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+      return false;
+    }
+
+    if (!$rslt) return false;
+
+    $rslt_token = hash('sha256', $rslt->id.$rslt->salt.date("z"));
+    if (strcmp($params->token, $rslt_token)) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   function login(){
     $request = Slim::getInstance()->request();
-    $login = json_decode($request->getBody());
-    $sql = "select id, hash, salt from users where name=:username";
+    $params = json_decode($request->getBody());
+
     try {
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam("username",$login->username);
-      $stmt->execute();
-      $auth = $stmt->fetchObject();
-      $db = null;
+      $rslt = userLookup($params->username);
     } catch (PDOException $e) {
       echo '{"error":{"text":'.$e->getMessage().'}}';
       return;
     }
 
-    $user_hash = hash('sha256', $login->password.$auth->salt);
-    if (strcmp($user_hash, $auth->hash)) {
+    $user_hash = hash('sha256', $params->password.$rslt->salt);
+    if (strcmp($user_hash, $rslt->hash)) {
       echo '{"token":""}';
     } else {
-      $token = hash('sha256', $auth->id.$auth->salt.date("z"));
-      echo '{"token":"'.$token.'"}';
+      $token = hash('sha256', $rslt->id.$rslt->salt.date("z"));
+      echo '{"username":"'.$params->username.'","token":"'.$token.'"}';
     }
   }
 
@@ -73,6 +101,11 @@
   }
 
   function addEntity(){
+    if (!validToken()) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
      error_log('addEntity'."\n", 3, '/var/tmp/php.log');
      $request = Slim::getInstance()->request();
      $entity = json_decode($request->getBody());
