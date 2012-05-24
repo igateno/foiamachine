@@ -4,6 +4,7 @@ var FOIARouter = Backbone.Router.extend({
 
   routes: {
     '':'login',
+    'login':'login',
     'request':'request',
     'dash':'dashboard',
     'forms':'forms',
@@ -13,6 +14,14 @@ var FOIARouter = Backbone.Router.extend({
     this.headerView = new HeaderView();
     this.headerView.render();
     $('header').html(this.headerView.el);
+  },
+
+  assertAuth: function(callback) {
+    if (!$.cookie()) {
+      this.navigate('login', {trigger: true});
+    } else {
+      callback();
+    }
   },
 
   login: function() {
@@ -25,28 +34,34 @@ var FOIARouter = Backbone.Router.extend({
   },
 
   request: function() {
-    if (!this.requestView) {
-      this.requestView = new RequestView();
-      this.requestView.render();
-    }
-    $('#container').html(this.requestView.el);
+    this.assertAuth(function() {
+      if (!this.requestView) {
+        this.requestView = new RequestView();
+        this.requestView.render();
+      }
+      $('#container').html(this.requestView.el);
+    });
   },
 
   dashboard: function() {
-    if (!this.dashView) {
-      this.dashView = new DashView();
-      this.dashView.render();
-    }
-    $('#container').html(this.dashView.el);
+    this.assertAuth(function() {
+      if (!this.dashView) {
+        this.dashView = new DashView();
+        this.dashView.render();
+      }
+      $('#container').html(this.dashView.el);
+    });
   },
 
   forms: function(tab) {
-    if (!this.formsView) {
-      this.formsView = new FormsView();
-      this.formsView.render();
-    }
-    $('#container').html(this.formsView.el);
-    this.formsView.populate();
+    this.assertAuth(function() {
+      if (!this.formsView) {
+        this.formsView = new FormsView();
+        this.formsView.render();
+      }
+      $('#container').html(this.formsView.el);
+      this.formsView.populate();
+    });
     /*this.elist = new EntityCollection();
     this.elist.fetch({
       success: function(collection) {
