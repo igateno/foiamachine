@@ -17,7 +17,7 @@ var FOIARouter = Backbone.Router.extend({
   },
 
   assertAuth: function(callback) {
-    if (!$.cookie()) {
+    if (!$.cookie('token')) {
       this.navigate('login', {trigger: true});
     } else {
       callback();

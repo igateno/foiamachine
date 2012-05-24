@@ -49,6 +49,7 @@ var LoginView = Backbone.View.extend({
     this.model.login({
       good: function() {
         self.alert(true, 'You logged in!');
+        app.navigate('forms', {trigger: true});
       },
       bad: function() {
         self.alert(false, 'Username and/or password incorrect');
