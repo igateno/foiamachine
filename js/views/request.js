@@ -29,10 +29,10 @@ var RequestView = Backbone.View.extend({
     $(this).tab('show');
   },
 
-  append_next: function(e, tpl_key) {
+  append_next: function(e, selector) {
     $(e.target).detach();
-    var template = _.template(tpl.get(tpl_key));
-    $('form#request fieldset').append(template);
+    var template = _.template($(selector).html());
+    $('#new-request form fieldset').append(template);
   },
 
   load_topics: function(e) {
@@ -40,9 +40,12 @@ var RequestView = Backbone.View.extend({
 
     if ($('#new-request input.country').val().length == 0) return;
 
-    this.append_next(e, 'request-partial-1');
-    $('form#country #topic input').typeahead({
-      'source': ['Drug War', 'Immigration', 'Sombreros']
+    this.append_next(e, '#topic-template');
+
+    this.topics = new TopicCollection();
+    this.topics.fetch();
+    $('#topic input').typeahead({
+      source: this.topics.nameArray()
     });
   },
 

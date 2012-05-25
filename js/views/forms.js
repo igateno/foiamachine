@@ -24,9 +24,10 @@ var EntityFormView = Backbone.View.extend({
     this.model.set({
       name: this.$('input.name').val(),
     });
+    this.prevType = this.model.get('type');
     this.model.save(null, {
       success: function(model) {
-        self.model = new Entity();
+        self.model = new Entity({type:self.prevType});
         self.render();
         $('#feedback').html('Success!');
       },

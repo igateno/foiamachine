@@ -1,6 +1,23 @@
+var FoiaCollection = Backbone.Collection.extend({
+
+  nameArray: function () {
+    this.result = [];
+    var self = this;
+    this.fetch({
+      success: function() {
+        _.each(self.models, function (element, index, list) {
+          self.result.push(element.get('name'));
+        }, self);
+      }
+    });
+    return this.result;
+  }
+
+});
+
 var Entity = Backbone.Model.extend({
 
-  url:'api/entities',
+  urlRoot:'api/entities',
 
   defaults: {
     name: '',
@@ -29,31 +46,18 @@ var RelationCollection = Backbone.Collection.extend({
 
 });
 
-var Country = Entity.extend({
+var CountryCollection = FoiaCollection.extend({
 
-  initialize: function() {
-    this.set({type: 1});
-  }
-
-});
-
-var CountryCollection = Backbone.Collection.extend({
-
-  model: Country,
+  model: Entity.extend({type:1}),
 
   url: 'api/countries',
 
-  nameArray: function () {
-    this.result = [];
-    var self = this;
-    this.fetch({
-      success: function() {
-        _.each(self.models, function (element, index, list) {
-          self.result.push(element.get('name'));
-        }, self);
-      }
-    });
-    return this.result;
-  }
+});
+
+var TopicCollection = FoiaCollection.extend({
+
+  model: Entity.extend({type:3}),
+
+  url: 'api/topics',
 
 });

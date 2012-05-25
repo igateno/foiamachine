@@ -9,6 +9,7 @@
   // Entities
   $app->get('/entities', 'getEntities');
   $app->get('/entities/:id', 'getEntity');
+  $app->get('/entities/type/:type', 'getEntitiesByType');
   $app->get('/entities/search/:query', 'findByName');
   $app->post('/entities', 'addEntity');
   $app->post('/entities/:id', 'updateEntity');
@@ -19,6 +20,9 @@
 
   // Countries
   $app->get('/countries', 'getCountries');
+
+  // Topics
+  $app->get('/topics', 'getTopics');
 
   $app->run();
 
@@ -190,17 +194,27 @@
      }
   }
 
-  function getCountries(){
-    $sql = "select * from entities where type = 1";
+  function getEntitiesByType($type){
+    $sql = "select * from entities where type = :type";
     try {
       $db = getConnection();
-      $stmt = $db->query($sql);
-      $countries = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('type', $type);
+      $stmt->execute();
+      $entities = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
-      echo json_encode($countries);
+      echo json_encode($entities);
     } catch (PDOException $e) {
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
+  }
+
+  function getCountries() {
+    getEntitiesByType(1);
+  }
+
+  function getTopics() {
+    getEntitiesByType(3);
   }
 
   function getConnection(){
