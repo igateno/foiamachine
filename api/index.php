@@ -17,6 +17,9 @@
   // Relations
   $app->get('/relations', 'getRelations');
 
+  // Countries
+  $app->get('/countries', 'getCountries');
+
   $app->run();
 
   function userLookup($name) {
@@ -185,6 +188,19 @@
      }catch(PDOException $e){
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
+  }
+
+  function getCountries(){
+    $sql = "select * from entities where type = 1";
+    try {
+      $db = getConnection();
+      $stmt = $db->query($sql);
+      $countries = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+      echo json_encode($countries);
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
 
   function getConnection(){

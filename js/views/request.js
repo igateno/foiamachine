@@ -6,7 +6,7 @@ var RequestView = Backbone.View.extend({
 
   events: {
     'click #request-countries a': 'tabs',
-    'click form#request input.btn': 'load_topics',
+    'click #new-request input.btn': 'load_topics',
     'click form#request input#topicBtn': 'load_countries',
     'click form#request input#agencyBtn': 'load_question',
     'click form#request input#qBtn': 'load_datepickers'
@@ -14,6 +14,13 @@ var RequestView = Backbone.View.extend({
 
   render: function() {
     $(this.el).html(this.template());
+
+    this.countries = new CountryCollection();
+    this.countries.fetch();
+    this.$('#new-request input.country').typeahead({
+      source: this.countries.nameArray()
+    });
+
     return this;
   },
 
@@ -30,7 +37,9 @@ var RequestView = Backbone.View.extend({
 
   load_topics: function(e) {
     e.preventDefault();
-    // should check for input and fire an alert if no input
+
+    if ($('#new-request input.country').val().length == 0) return;
+
     this.append_next(e, 'request-partial-1');
     $('form#country #topic input').typeahead({
       'source': ['Drug War', 'Immigration', 'Sombreros']

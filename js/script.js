@@ -83,7 +83,6 @@ var FOIARouter = Backbone.Router.extend({
 var templates = [
   'header',
   'request',
-  'request-partial-1',
   'request-partial-2',
   'request-partial-3',
   'request-partial-4',

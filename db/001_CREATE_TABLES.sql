@@ -8,7 +8,8 @@ drop table if exists `foia`.`users`;
 create table `foia`.`entities` (
   `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR (250) NOT NULL,
-  `type` INTEGER UNSIGNED NOT NULL
+  `type` INTEGER UNSIGNED NOT NULL,
+  UNIQUE KEY (`name`)
 ) engine = InnoDB;
 
 create table `foia`.`relations` (
