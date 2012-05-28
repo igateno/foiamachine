@@ -87,8 +87,6 @@ var templates = [
   'agency-tab',
   'agency-div',
   'agency-checkbox',
-  'request-partial-3',
-  'request-partial-4',
   'dashboard',
   'login',
   'forms',

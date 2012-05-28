@@ -11,7 +11,7 @@ Team:
 
 ## Ubuntu Dev Environment Setup
 
-- git clone git@github.com:igateno/foiamachine.git
+- git clone --recursive git@github.com:igateno/foiamachine.git
 - follow the instructions found at https://wiki.ubuntu.com/Lighttpd%2BPHP
 to install lighttpd and enable fastCGI
 - copy or symlink etc/lighttpd.conf in place of the default lighttpd.conf

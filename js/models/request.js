@@ -2,10 +2,12 @@ var Request = Backbone.Model.extend({
 
   url: 'api/requestTabs',
 
-  defaults: {
-    country: '',
-    topic: '',
-    token: '',
+  defaults: function() {
+    return {
+      country: '',
+      topic: '',
+      token: '',
+    }
   },
 
   fetchTabs: function(callback) {
@@ -19,13 +21,17 @@ var Request = Backbone.Model.extend({
       data: JSON.stringify(this),
       dataType: 'json'
     }).done(function(results) {
-      self.set('agencies', results);
+      self.set('suggestions', results);
       callback();
     });
   },
 
-  iterateTabs: function(ifunc, context) {
-    _.each(this.get('agencies'), ifunc, context);
+  saveAgencies: function(checkboxes) {
+    this.set('agencies', [])
+    _.each(checkboxes, function(element, index, list) {
+      this.get('agencies').push(element.id);
+    }, this);
+    console.log(this.get('agencies'));
   }
 
 });

@@ -243,10 +243,13 @@
 
     $tabs = array();
     foreach ($results as $result) {
-      if (!array_key_exists($result->country, $tabs))
-        $tabs[$result->country] = array();
-
-      $tabs[$result->country][] = $result->agency;
+      $id = $result->country_id;
+      if (!array_key_exists($id, $tabs)) {
+        $tabs[$id] = array();
+        $tabs[$id]['name'] = $result->country_name;
+        $tabs[$id]['agencies'] = array();
+      }
+      $tabs[$id]['agencies'][$result->agency_id] = $result->agency_name;
     }
 
     echo json_encode($tabs);

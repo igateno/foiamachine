@@ -1,11 +1,8 @@
-/*
- * Country name and agency name of agencies related to Intelligence
- * in countries that know about the United States or are the United States
- * This needs to be submitted to some more thorough testing.
- */
 select
-  countries.name as country,
-  agencies.name as agency
+  countries.id as country_id,
+  countries.name as country_name,
+  agencies.id as agency_id,
+  agencies.name as agency_name
 from
   relations as r1,
   relations as r2,

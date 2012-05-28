@@ -52,24 +52,22 @@ var RequestView = Backbone.View.extend({
   },
 
   build_tabs: function(element, index, list) {
-    var div_id = index.replace(' ', '_');
-
     var tabTemplate = _.template(tpl.get('agency-tab'));
     $('#agency-tabs ul').append(tabTemplate({
-      div_id: div_id,
-      country: index
+      div_id: index,
+      country: element.name
     }));
 
     var divTemplate = _.template(tpl.get('agency-div'));
     $('#agencies').append(divTemplate({
-      div_id: div_id
+      div_id: index
     }));
 
-    _.each(element, function(elem, i, l) {
+    _.each(element.agencies, function(elem, i, l) {
       var cboxTemplate = _.template(tpl.get('agency-checkbox'));
-      console.log(elem);
-      $('#' + div_id + ' ul').append(cboxTemplate({
-        country: elem
+      $('#' + index + ' ul').append(cboxTemplate({
+        agency: elem,
+        id: i
       }));
     }, this);
   },
@@ -84,18 +82,19 @@ var RequestView = Backbone.View.extend({
     this.model.set('topic', $('#new-request input.topic').val());
     this.model.fetchTabs(function() {
       self.append_next(e, '#agency-template');
-      _.each(self.model.get('agencies'), self.build_tabs, self);
+      _.each(self.model.get('suggestions'), self.build_tabs, self);
     });
   },
 
   load_question: function(e) {
     e.preventDefault();
-    this.append_next(e, 'request-partial-3');
+    this.model.saveAgencies($('#agencies :checkbox:checked'));
+    this.append_next(e, '#question-template');
   },
 
   load_datepickers: function(e) {
     e.preventDefault();
-    this.append_next(e, 'request-partial-4');
+    this.append_next(e, '#datepicker-template');
     $('.datepicker').datepicker();
     $('.btn').button();
   }
