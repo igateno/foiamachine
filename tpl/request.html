@@ -26,9 +26,27 @@
 <!-- topic typeahead -->
 <script id="topic-template" type="text/template">
   <div id="topic">
-    <input type="text"
+    <input class="topic"
+           type="text"
            data-provide="typeahead"
            placeholder="What is this about?">
     <input id="topicBtn" type="submit" value="Next">
   </div> <!-- topic -->
+</script>
+
+<!-- agency tabs -->
+<script id="agency-template" type="text/template">
+  <div class="row-fluid">
+
+    <div id="agency-tabs" class="span4">
+      <ul class="nav nav-pills nav-stacked">
+        <!-- country names here -->
+      </ul>
+    </div> <!-- request-countries -->
+
+    <div id="agencies" class="span8 tab-content">
+      <!-- agency names here -->
+    </div> <!-- agencies -->
+
+  </div> <!-- row-fluid -->
 </script>

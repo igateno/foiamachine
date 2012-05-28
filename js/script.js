@@ -36,7 +36,8 @@ var FOIARouter = Backbone.Router.extend({
   request: function() {
     this.assertAuth(function() {
       if (!this.requestView) {
-        this.requestView = new RequestView();
+        var request = new Request();
+        this.requestView = new RequestView({model: request});
         this.requestView.render();
       }
       $('#container').html(this.requestView.el);
@@ -83,7 +84,9 @@ var FOIARouter = Backbone.Router.extend({
 var templates = [
   'header',
   'request',
-  'request-partial-2',
+  'agency-tab',
+  'agency-div',
+  'agency-checkbox',
   'request-partial-3',
   'request-partial-4',
   'dashboard',

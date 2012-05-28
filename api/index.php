@@ -24,6 +24,9 @@
   // Topics
   $app->get('/topics', 'getTopics');
 
+  // Request
+  $app->post('/agencyTabs', 'agencyTabs');
+
   $app->run();
 
   function userLookup($name) {
@@ -215,6 +218,38 @@
 
   function getTopics() {
     getEntitiesByType(3);
+  }
+
+  /*
+   * TODO this is a hack
+   * architecture for stuff like this needs to be thought out better
+   */
+  function agencyTabs() {
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = file_get_contents('../db/queries/agency_tabs.sql');
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('country', $params->country);
+      $stmt->bindParam('topic', $params->topic);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+
+    $tabs = array();
+    foreach ($results as $result) {
+      if (!array_key_exists($result->country, $tabs))
+        $tabs[$result->country] = array();
+
+      $tabs[$result->country][] = $result->agency;
+    }
+
+    echo json_encode($tabs);
   }
 
   function getConnection(){
