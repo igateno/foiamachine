@@ -11,10 +11,24 @@ var FoiaCollection = Backbone.Collection.extend({
       }
     });
     return this.result;
+  },
+
+  idForName: function (name) {
+    return _.find(this.models, function(model){
+      return model.get('name') == name;
+    }, this).get('id');
   }
 
 });
 
+/*
+ * I haven't found a good way to enumerate the types of entity
+ * in backbone but they are:
+ * country 1
+ * agency 2
+ * topic 3
+ * doctype 4
+ */
 var Entity = Backbone.Model.extend({
 
   urlRoot:'api/entities',
@@ -24,7 +38,7 @@ var Entity = Backbone.Model.extend({
     type: 0,
     username: $.cookie('username'),
     token: $.cookie('token')
-  }
+  },
 
 });
 
@@ -59,5 +73,13 @@ var TopicCollection = FoiaCollection.extend({
   model: Entity.extend({type:3}),
 
   url: 'api/topics',
+
+});
+
+var DoctypeCollection = FoiaCollection.extend({
+
+  model: Entity.extend({type:4}),
+
+  url: 'api/doctypes',
 
 });

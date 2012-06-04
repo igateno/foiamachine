@@ -7,9 +7,15 @@ var RequestView = Backbone.View.extend({
   events: {
     'click #request-countries a': 'tabs',
     'click #new-request input.btn': 'load_topics',
-    'click #new-request input#topicBtn': 'load_countries',
+    'click #new-request input#topicBtn': 'load_tabs',
     'click #new-request input#agencyBtn': 'load_question',
-    'click #new-request input#qBtn': 'load_datepickers'
+    'click #new-request input#qBtn': 'load_datepickers',
+    'click #new-request input#dateBtn': 'preview_request',
+    'click .doctypes button': 'toggle_doctype'
+  },
+
+  partials: {
+    doc_buttons: '<button id="<%= id %>" class="btn"><%= name %></button>',
   },
 
   render: function() {
@@ -40,7 +46,8 @@ var RequestView = Backbone.View.extend({
 
     if ($('#new-request input.country').val().length == 0) return;
 
-    this.model.set('country', $('#new-request input.country').val());
+    var cname = $('#new-request input.country').val();
+    this.model.set('country', this.countries.idForName(cname));
 
     this.append_next(e, '#topic-template');
 
@@ -72,31 +79,77 @@ var RequestView = Backbone.View.extend({
     }, this);
   },
 
-  load_countries: function(e) {
+  load_tabs: function(e) {
     e.preventDefault();
 
     if ($('#new-request input.topic').val().length == 0) return;
 
     var self = this;
 
-    this.model.set('topic', $('#new-request input.topic').val());
-    this.model.fetchTabs(function() {
-      self.append_next(e, '#agency-template');
-      _.each(self.model.get('suggestions'), self.build_tabs, self);
+    var tname = $('#new-request input.topic').val();
+    this.model.set('topic', this.topics.idForName(tname));
+    this.model.save({
+      success: function (model, response) {
+        // TODO
+        console.log('save has returned success');
+        /*this.model.fetchTabs(function() {
+          self.append_next(e, '#agency-template');
+          _.each(self.model.get('suggestions'), self.build_tabs, self);
+        });*/
+      },
+      error: function (model, response) {
+        // TODO
+      }
     });
+
   },
 
   load_question: function(e) {
     e.preventDefault();
-    this.model.saveAgencies($('#agencies :checkbox:checked'));
+    this.model.setAgencies($('#agencies :checkbox:checked'));
     this.append_next(e, '#question-template');
   },
 
   load_datepickers: function(e) {
     e.preventDefault();
+
+    if ($('#new-request textarea').val().length == 0) return;
+
+    this.model.set('question', $('#new-request textarea').val());
     this.append_next(e, '#datepicker-template');
+
+    var self = this;
+
+    var docTemplate = _.template(this.partials.doc_buttons);
+    this.doctypes = new DoctypeCollection();
+    this.doctypes.fetch({
+      success: function(collection) {
+        _.each(collection.models, function(element, index, list) {
+          $('#new-request .doctypes').append(docTemplate({
+            id: element.get('id'),
+            name: element.get('name')
+          }));
+        }, self);
+      }
+    });
+
     $('.datepicker').datepicker();
-    $('.btn').button();
+  },
+
+  toggle_doctype: function(e) {
+    e.preventDefault();
+    $(e.target).attr('id');
+  },
+
+  preview_request: function(e) {
+    e.preventDefault();
+    this.model.set('start', $('#new-request input.start').val());
+    this.model.set('end', $('#new-request input.end').val());
+
+    this.model.setDoctypes($('.btn-group button.active'));
+    console.log(this.model.get('doctypes'));
+    // TODO make request log entry in db
+    // TODO display preview of request on page?
   }
 
 });

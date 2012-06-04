@@ -1,3 +1,6 @@
+/*
+ * The last part of the where clause could probably be simplified
+ */
 select
   countries.id as country_id,
   countries.name as country_name,
@@ -14,17 +17,13 @@ where
   r1.id2 = agencies.id and
   r2.id1 = topics.id and
   r2.id2 = agencies.id and
-  topics.name = :topic and
+  topics.id = :topic and
   countries.id in (
     select
       id
     from
       entities
     where
-    name = :country or
-    id in (
-      select id1 from relations where id2 in (
-        select id from entities where name = :country
-      )
-    )
+    id = :country or
+    id in (select id1 from relations where id2 = :country)
   );

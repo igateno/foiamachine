@@ -3,31 +3,37 @@
 
   $app = new Slim();
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Routes
+  //
+  /////////////////////////////////////////////////////////////////////////
+
   // Auth
   $app->post('/auth', 'login');
 
   // Entities
   $app->get('/entities', 'getEntities');
-  $app->get('/entities/:id', 'getEntity');
   $app->get('/entities/type/:type', 'getEntitiesByType');
-  $app->get('/entities/search/:query', 'findByName');
   $app->post('/entities', 'addEntity');
-  $app->post('/entities/:id', 'updateEntity');
-  $app->post('/entities/:id', 'deleteEntity');
+
+  $app->get('/countries', 'getCountries');
+  $app->get('/topics', 'getTopics');
+  $app->get('/doctypes', 'getDoctypes');
 
   // Relations
   $app->get('/relations', 'getRelations');
-
-  // Countries
-  $app->get('/countries', 'getCountries');
-
-  // Topics
-  $app->get('/topics', 'getTopics');
 
   // Request
   $app->post('/agencyTabs', 'agencyTabs');
 
   $app->run();
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Authentication
+  //
+  /////////////////////////////////////////////////////////////////////////
 
   function userLookup($name) {
     $sql = "select id, hash, salt from users where name=:username";
@@ -82,6 +88,12 @@
     }
   }
 
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Entities
+  //
+  /////////////////////////////////////////////////////////////////////////
+
   function getEntities(){
      $sql = "select * from entities order by name";
      try{
@@ -90,108 +102,6 @@
         $entities = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
         echo json_encode($entities);
-     }catch(PDOException $e){
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
-  }
-
-  function getEntity($id){
-     $sql = "select * from entities where id=:id";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $entity = $stmt->fetchObject();
-        $db = null;
-        echo json_encode($entity);
-     }catch(PDOException $e){
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
-  }
-
-  function addEntity(){
-    if (!validToken()) {
-      echo '{"error": "invalid token"}';
-      return;
-    }
-
-     error_log('addEntity'."\n", 3, '/var/tmp/php.log');
-     $request = Slim::getInstance()->request();
-     $entity = json_decode($request->getBody());
-    $sql = "insert into entities (name, type) values(:name, :type)";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("name", $entity->name);
-        $stmt->bindParam("type", $entity->type);
-        $stmt->execute();
-        $entity->id = $db->lastInsertId();
-        $db = null;
-        echo json_encode($entity);
-     }catch(PDOException $e){
-        error_log($e->getMessage()."\n", 3, '/var/tmp/php.log');
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
-  }
-
-  function updateEntity(){
-     $request = Slim::getInstance()->request();
-     $entity = jsonEncode($request->getBody());
-     $sql = "update entities set name=:name, type=:type where id=:id";
-     try{
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $stmt->bindParam("name", $entity->name);
-        $stmt->bindParam("type", $entity->type);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $db = null;
-        echo json_encode($entity);
-     }catch(PDOException $e){
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
-  }
-
-  function deleteEntity($id){
-     $sql = "delete from entities where id=:id";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("id", $id);
-        $stmt->execute();
-        $db = null;
-     }catch (PDOException $e){
-        echo '{"error":{"text"'.$e->getMessage().'}}';
-     }
-  }
-
-  function findByName($query){
-     $sql = "select * from entities where name=:name";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $query = "%".$query."%";
-        $stmt->bindParam("query", $query);
-        $stmt->execute();
-        $entities = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($entities);
-     }catch (PDOException $e){
-        echo '{"error":{"text"'.$e->getMessage().'}}';
-     }
-  }
-
-  function getRelations(){
-     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
-       "from entities as e1, entities as e2, relations as r " .
-       "where e1.id = r.id1 and e2.id = r.id2;";
-     try{
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($relations);
      }catch(PDOException $e){
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
@@ -220,13 +130,70 @@
     getEntitiesByType(3);
   }
 
-  /*
-   * TODO this is a hack
-   * architecture for stuff like this needs to be thought out better
-   */
-  function agencyTabs() {
+  function getDoctypes() {
+    getEntitiesByType(4);
+  }
+
+  function addEntity(){
+    if (!validToken()) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+     error_log('addEntity'."\n", 3, '/var/tmp/php.log');
+     $request = Slim::getInstance()->request();
+     $entity = json_decode($request->getBody());
+    $sql = "insert into entities (name, type) values(:name, :type)";
+     try{
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("name", $entity->name);
+        $stmt->bindParam("type", $entity->type);
+        $stmt->execute();
+        $entity->id = $db->lastInsertId();
+        $db = null;
+        echo json_encode($entity);
+     }catch(PDOException $e){
+        error_log($e->getMessage()."\n", 3, '/var/tmp/php.log');
+        echo '{"error":{"text":'.$e->getMessage().'}}';
+     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Relations
+  //
+  /////////////////////////////////////////////////////////////////////////
+
+  function getRelations(){
+     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
+       "from entities as e1, entities as e2, relations as r " .
+       "where e1.id = r.id1 and e2.id = r.id2;";
+     try{
+        $db = getConnection();
+        $stmt = $db->query($sql);
+        $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        echo json_encode($relations);
+     }catch(PDOException $e){
+        echo '{"error":{"text":'.$e->getMessage().'}}';
+     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Agency Tabs
+  //
+  // The functions below use the entities and relations tables to populate
+  // the agencies suggested to the user during the request composition
+  // process.
+  //
+  /////////////////////////////////////////////////////////////////////////
+
+  function agencyTabsQuery() {
     $request = Slim::getInstance()->request();
     $params = json_decode($request->getBody());
+    $results = null;
 
     $sql = file_get_contents('../db/queries/agency_tabs.sql');
     try {
@@ -241,19 +208,40 @@
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
 
-    $tabs = array();
-    foreach ($results as $result) {
-      $id = $result->country_id;
-      if (!array_key_exists($id, $tabs)) {
-        $tabs[$id] = array();
-        $tabs[$id]['name'] = $result->country_name;
-        $tabs[$id]['agencies'] = array();
-      }
-      $tabs[$id]['agencies'][$result->agency_id] = $result->agency_name;
+    return $results;
+  }
+
+  function agencyTabs() {
+    if (!validToken()) {
+      echo '{"error": "invalid token"}';
+      return;
     }
 
-    echo json_encode($tabs);
+    $results = agencyTabsQuery();
+
+    if (!$results) {
+      // TODO echo error message? did that not happen already?
+    } else {
+      $tabs = array();
+      foreach ($results as $result) {
+        $id = $result->country_id;
+        if (!array_key_exists($id, $tabs)) {
+          $tabs[$id] = array();
+          $tabs[$id]['name'] = $result->country_name;
+          $tabs[$id]['agencies'] = array();
+        }
+        $tabs[$id]['agencies'][$result->agency_id] = $result->agency_name;
+      }
+
+      echo json_encode($tabs);
+    }
   }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // DB Connection
+  //
+  /////////////////////////////////////////////////////////////////////////
 
   function getConnection(){
      $dbhost = "localhost";
