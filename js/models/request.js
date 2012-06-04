@@ -24,6 +24,8 @@ var RequestDoctype = Backbone.Model.extend({
   urlRoot: 'api/requestDoctypes',
 
   defaults: {
+    username: $.cookie('username'),
+    token: $.cookie('token'),
     request_log_id: null,
     doctype_id: null
   }
@@ -47,8 +49,8 @@ var Request = Backbone.Model.extend({
     token: '',
     country: '',
     topic: '',
-    start: '',
-    end: '',
+    start: null,
+    end: null,
     question: ''
   },
 
@@ -81,9 +83,12 @@ var Request = Backbone.Model.extend({
   },
 
   setDoctypes: function(buttons) {
-    this.set('doctypes', [])
+    this.set('doctypes', new RequestDoctypeCollection())
     _.each(buttons, function(element, index, list) {
-      this.get('doctypes').push($(element).attr('id'));
+      this.get('doctypes').create({
+        request_log_id: this.id,
+        doctype_id: $(element).attr('id')
+      });
     }, this);
   }
 

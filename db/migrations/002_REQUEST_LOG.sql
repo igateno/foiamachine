@@ -1,5 +1,5 @@
 drop table if exists `foia`.`request_log_agencies`;
-drop table if exists `foia`.`request_log_doc_types`;
+drop table if exists `foia`.`request_log_doctypes`;
 drop table if exists `foia`.`request_log`;
 
 /*
@@ -40,7 +40,7 @@ create table `foia`.`request_log_agencies` (
     on delete cascade
 ) engine = InnoDB;
 
-create table `foia`.`request_log_doc_types` (
+create table `foia`.`request_log_doctypes` (
   `request_log_id` integer unsigned not null,
   `doctype_id` integer unsigned not null,
   primary key (`request_log_id`, `doctype_id`),

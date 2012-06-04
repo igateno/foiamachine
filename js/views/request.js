@@ -114,25 +114,32 @@ var RequestView = Backbone.View.extend({
 
     if ($('#new-request textarea').val().length == 0) return;
 
-    this.model.set('question', $('#new-request textarea').val());
-    this.append_next(e, '#datepicker-template');
-
     var self = this;
 
-    var docTemplate = _.template(this.partials.doc_buttons);
-    this.doctypes = new DoctypeCollection();
-    this.doctypes.fetch({
-      success: function(collection) {
-        _.each(collection.models, function(element, index, list) {
-          $('#new-request .doctypes').append(docTemplate({
-            id: element.get('id'),
-            name: element.get('name')
-          }));
-        }, self);
+    this.model.set('question', $('#new-request textarea').val());
+    this.model.save(null, {
+      success: function (model, response) {
+        self.append_next(e, '#datepicker-template');
+
+        var docTemplate = _.template(self.partials.doc_buttons);
+        self.doctypes = new DoctypeCollection();
+        self.doctypes.fetch({
+          success: function(collection) {
+            _.each(collection.models, function(element, index, list) {
+              $('#new-request .doctypes').append(docTemplate({
+                id: element.get('id'),
+                name: element.get('name')
+              }));
+            }, self);
+          }
+        });
+
+        $('.datepicker').datepicker();
+      },
+      error: function (model, response) {
+        // TODO
       }
     });
-
-    $('.datepicker').datepicker();
   },
 
   toggle_doctype: function(e) {
@@ -146,9 +153,15 @@ var RequestView = Backbone.View.extend({
     this.model.set('end', $('#new-request input.end').val());
 
     this.model.setDoctypes($('.btn-group button.active'));
-    console.log(this.model.get('doctypes'));
-    // TODO make request log entry in db
-    // TODO display preview of request on page?
+    this.model.save(null, {
+      success: function (model, response) {
+        // TODO display preview of request on page?
+        console.log('yeah, baby!');
+      },
+      error: function (model, response) {
+        // TODO
+      }
+    });
   }
 
 });

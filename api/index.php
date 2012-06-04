@@ -32,6 +32,7 @@
   $app->put('/requestLog', 'updateRequestLog');
 
   $app->post('/requestAgencies', 'addRequestAgencies');
+  $app->post('/requestDoctypes', 'addRequestDoctypes');
 
   $app->run();
 
@@ -278,7 +279,32 @@
   }
 
   function updateRequestLog() {
-    // TODO
+    $id = validateToken();
+    if (!$id) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = 'update request_log set '.
+           'start_date = :start_date, '.
+           'end_date = :end_date, '.
+           'question = :question '.
+           'where id = :id';
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('id', $params->id);
+      $stmt->bindParam('start_date', $params->start);
+      $stmt->bindParam('end_date', $params->end);
+      $stmt->bindParam('question', $params->question);
+      $stmt->execute();
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
 
   function addRequestAgencies() {
@@ -299,9 +325,31 @@
       $stmt->bindParam('request_log_id', $params->request_log_id);
       $stmt->bindParam('agency_id', $params->agency_id);
       $stmt->execute();
-      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
-      echo json_encode($results);
+    }catch(PDOException $e){
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  function addRequestDoctypes() {
+    $id = validateToken();
+    if (!$id) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = 'insert into request_log_doctypes (request_log_id, doctype_id)'.
+           'values (:request_log_id, :doctype_id)';
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('request_log_id', $params->request_log_id);
+      $stmt->bindParam('doctype_id', $params->doctype_id);
+      $stmt->execute();
+      $db = null;
     }catch(PDOException $e){
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
