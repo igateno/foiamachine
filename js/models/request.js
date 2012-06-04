@@ -38,7 +38,7 @@ var RequestDoctypeCollection = FoiaCollection.extend({
 
 var Request = Backbone.Model.extend({
 
-  url: 'api/requestTabs',
+  url: 'api/requestLog',
 
   defaults: {
     username: '',
@@ -67,11 +67,6 @@ var Request = Backbone.Model.extend({
       callback();
     });
   },
-
-  // TODO sync the request once you have the minimum
-  // any additional info gets done via update
-  // Make it so that agencies and doctypes are set as collections
-  // wich each syncing to a row in their respective tables
 
   setAgencies: function(checkboxes) {
     this.set('agencies', new RequestAgencyCollection())

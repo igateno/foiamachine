@@ -1,13 +1,13 @@
 <?php
   require 'Slim/Slim/Slim.php';
 
-  $app = new Slim();
-
   //////////////////////////////////////////////////////////////////////////
   //
-  // Routes
+  // App Instantiation and Routes
   //
   /////////////////////////////////////////////////////////////////////////
+
+  $app = new Slim();
 
   // Auth
   $app->post('/auth', 'login');
@@ -24,8 +24,12 @@
   // Relations
   $app->get('/relations', 'getRelations');
 
-  // Request
+  // Agency Tabs (Entities and Relations tables)
   $app->post('/agencyTabs', 'agencyTabs');
+
+  // Request Log
+  $app->post('/requestLog', 'addRequestLog');
+  $app->put('/requestLog', 'updateRequestLog');
 
   $app->run();
 
@@ -47,7 +51,7 @@
     return $auth;
   }
 
-  function validToken() {
+  function validateToken() {
     $request = Slim::getInstance()->request();
     $params = json_decode($request->getBody());
 
@@ -62,9 +66,9 @@
 
     $rslt_token = hash('sha256', $rslt->id.$rslt->salt.date("z"));
     if (strcmp($params->token, $rslt_token)) {
-      return false;
+      return null;
     } else {
-      return true;
+      return $rslt->id;
     }
   }
 
@@ -135,7 +139,8 @@
   }
 
   function addEntity(){
-    if (!validToken()) {
+    $id = validateToken();
+    if (!$id) {
       echo '{"error": "invalid token"}';
       return;
     }
@@ -212,7 +217,7 @@
   }
 
   function agencyTabs() {
-    if (!validToken()) {
+    if (!validateToken()) {
       echo '{"error": "invalid token"}';
       return;
     }
@@ -235,6 +240,43 @@
 
       echo json_encode($tabs);
     }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Request Log
+  //
+  /////////////////////////////////////////////////////////////////////////
+
+  function addRequestLog() {
+    $id = validateToken();
+    if (!$id) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = 'insert into request_log (user_id, country_id, topic_id)'.
+           'values (:user_id, :country_id, :topic_id)';
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('user_id', $id);
+      $stmt->bindParam('country_id', $params->country);
+      $stmt->bindParam('topic_id', $params->topic);
+      $stmt->execute();
+      $params->id = $db->lastInsertId();
+      $db = null;
+      echo json_encode($params);
+    }catch(PDOException $e){
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  function updateRequestLog() {
+    // TODO
   }
 
   //////////////////////////////////////////////////////////////////////////

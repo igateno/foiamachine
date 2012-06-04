@@ -88,14 +88,13 @@ var RequestView = Backbone.View.extend({
 
     var tname = $('#new-request input.topic').val();
     this.model.set('topic', this.topics.idForName(tname));
-    this.model.save({
+    this.model.save(null, {
       success: function (model, response) {
-        // TODO
-        console.log('save has returned success');
-        /*this.model.fetchTabs(function() {
+        self.model.set('id', response.id);
+        self.model.fetchTabs(function() {
           self.append_next(e, '#agency-template');
           _.each(self.model.get('suggestions'), self.build_tabs, self);
-        });*/
+        });
       },
       error: function (model, response) {
         // TODO
