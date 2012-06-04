@@ -31,6 +31,8 @@
   $app->post('/requestLog', 'addRequestLog');
   $app->put('/requestLog', 'updateRequestLog');
 
+  $app->post('/requestAgencies', 'addRequestAgencies');
+
   $app->run();
 
   //////////////////////////////////////////////////////////////////////////
@@ -277,6 +279,32 @@
 
   function updateRequestLog() {
     // TODO
+  }
+
+  function addRequestAgencies() {
+    $id = validateToken();
+    if (!$id) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = 'insert into request_log_agencies (request_log_id, agency_id)'.
+           'values (:request_log_id, :agency_id)';
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('request_log_id', $params->request_log_id);
+      $stmt->bindParam('agency_id', $params->agency_id);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+      echo json_encode($results);
+    }catch(PDOException $e){
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////

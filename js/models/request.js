@@ -3,6 +3,8 @@ var RequestAgency = Backbone.Model.extend({
   urlRoot: 'api/requestAgencies',
 
   defaults: {
+    username: $.cookie('username'),
+    token: $.cookie('token'),
     request_log_id: null,
     agency_id: null
   }
@@ -13,7 +15,7 @@ var RequestAgencyCollection = FoiaCollection.extend({
 
   model: RequestAgency,
 
-  url: 'api/requestAgencies'
+  url: 'api/requestAgencies',
 
 });
 
@@ -71,7 +73,7 @@ var Request = Backbone.Model.extend({
   setAgencies: function(checkboxes) {
     this.set('agencies', new RequestAgencyCollection())
     _.each(checkboxes, function(element, index, list) {
-      this.get('agencies').add({
+      this.get('agencies').create({
         request_log_id: this.id,
         agency_id: element.id
       });
