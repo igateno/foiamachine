@@ -5,12 +5,12 @@ var LoginView = Backbone.View.extend({
   },
 
   events: {
-    'click #div-login a.login': 'login',
+    'click #login a.login': 'login',
     'keypress #password input': 'loginEnter'
   },
 
   render: function() {
-    $(this.el).html(this.template());
+    $(this.el).addClass('span12').html(this.template());
     return this
   },
 
