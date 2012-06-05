@@ -119,7 +119,10 @@ var RequestView = Backbone.View.extend({
     this.model.set('question', $('#new-request textarea').val());
     this.model.save(null, {
       success: function (model, response) {
-        self.append_next(e, '#datepicker-template');
+        self.append_next(e, '#date-doctype-template');
+        var date_template = _.template($('#datepicker-template').html());
+        $('span.date-container.start').html(date_template());
+        $('span.date-container.end').html(date_template());
 
         var docTemplate = _.template(self.partials.doc_buttons);
         self.doctypes = new DoctypeCollection();
@@ -133,8 +136,6 @@ var RequestView = Backbone.View.extend({
             }, self);
           }
         });
-
-        $('.datepicker').datepicker();
       },
       error: function (model, response) {
         // TODO
@@ -147,10 +148,17 @@ var RequestView = Backbone.View.extend({
     $(e.target).attr('id');
   },
 
+  get_date: function (str) {
+    var year = $('span.date-container.' + str + ' select.year').val();
+    var month = $('span.date-container.' + str + ' select.month').val();
+    var day = $('span.date-container.' + str + ' select.day').val();
+    return year + '-' + month + '-' + day;
+  },
+
   preview_request: function(e) {
     e.preventDefault();
-    this.model.set('start', $('#new-request input.start').val());
-    this.model.set('end', $('#new-request input.end').val());
+    this.model.set('start', this.get_date('start'));
+    this.model.set('end', this.get_date('end'));
 
     this.model.setDoctypes($('.btn-group button.active'));
     this.model.save(null, {
