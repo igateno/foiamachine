@@ -11,14 +11,14 @@
 
   <div class="row-fluid">
     <div id="login" class="span6">
-      <form id="form-login" action="#request">
+      <form>
         <fieldset>
           <legend>Existing user?</legend>
-          <div id="username">
+          <div class="username">
             <label for="username">Username:</label>
             <input name="username" type="text" required autofocus>
           </div> <!-- username -->
-          <div id="password">
+          <div class="password">
             <label for="password">Password:</label>
             <input name="password" type="password" required>
           </div> <!-- password -->
@@ -39,6 +39,10 @@
             <label for="username">Username:</label>
             <input name="username" type="text" required autofocus>
           </div> <!-- username -->
+          <div class="email">
+            <label for="email">Email:</label>
+            <input name="email" type="email" required>
+          </div> <!-- email -->
           <div class="password1">
             <label for="password1">Password:</label>
             <input name="password1" type="password" required>
@@ -47,10 +51,10 @@
             <label for="password2">Again, please:</label>
             <input name="password2" type="password" required>
           </div> <!-- password2 -->
-          <div class="email">
-            <label for="email">Email:</label>
-            <input name="email" type="email" required>
-          </div> <!-- email -->
+          <div class="code">
+            <label for="code">Access code:</label>
+            <input name="code" type="password" required>
+          </div> <!-- code -->
         </fieldset>
 
         <div>

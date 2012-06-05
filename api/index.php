@@ -10,7 +10,8 @@
   $app = new Slim();
 
   // Auth
-  $app->post('/auth', 'login');
+  $app->post('/auth', 'register');
+  $app->put('/auth', 'login');
 
   // Entities
   $app->get('/entities', 'getEntities');
@@ -44,12 +45,19 @@
 
   function userLookup($name) {
     $sql = "select id, hash, salt from users where name=:username";
-    $db = getConnection();
-    $stmt = $db->prepare($sql);
-    $stmt->bindParam("username",$name);
-    $stmt->execute();
-    $auth = $stmt->fetchObject();
-    $db = null;
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("username",$name);
+      $stmt->execute();
+      $auth = $stmt->fetchObject();
+      $db = null;
+    } catch (PDOException $e) {
+      // TODO log this error message
+      // echo '{"error":{"text":'.$e->getMessage().'}}';
+      return null;
+    }
 
     return $auth;
   }
@@ -65,7 +73,7 @@
       return false;
     }
 
-    if (!$rslt) return false;
+    if (!$rslt) return null;
 
     $rslt_token = hash('sha256', $rslt->id.$rslt->salt.date("z"));
     if (strcmp($params->token, $rslt_token)) {
@@ -75,23 +83,74 @@
     }
   }
 
+  function echoToken($id, $salt) {
+    $token = hash('sha256', $id.$salt.date("z"));
+    echo '{"token":"'.$token.'"}';
+  }
+
+  function echoError($errstr) {
+    echo '{"error":"'.$errstr.'","token":""}';
+  }
+
   function login(){
     $request = Slim::getInstance()->request();
     $params = json_decode($request->getBody());
 
-    try {
-      $rslt = userLookup($params->username);
-    } catch (PDOException $e) {
-      echo '{"error":{"text":'.$e->getMessage().'}}';
+    $rslt = userLookup($params->username);
+    if (!$rslt) {
+      echoError('Username does not exist.');
       return;
     }
 
     $user_hash = hash('sha256', $params->password.$rslt->salt);
     if (strcmp($user_hash, $rslt->hash)) {
-      echo '{"token":""}';
+      echoError('Your password is incorrect.');
     } else {
-      $token = hash('sha256', $rslt->id.$rslt->salt.date("z"));
-      echo '{"username":"'.$params->username.'","token":"'.$token.'"}';
+      echoToken($rslt->id, $rslt->salt);
+    }
+  }
+
+  function register() {
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $existing = userLookup($params->username);
+    if ($existing) {
+      echoError('Username already in use.');
+      return;
+    }
+
+    // strcmp returns 0 if there is a match
+    // nonzero will trigger the error
+    if (strcmp($params->code, 'cs194foia12')) {
+      echoError('Wrong access code.');
+      return;
+    }
+
+    // TODO
+    // - check that email is not already in use
+    // - check that email is valid
+    // - send confirmation email and have a way to receive response
+
+    $salt = hash('sha256', uniqid(mt_rand(),true));
+    $hash = hash('sha256', $params->password.$salt);
+    $sql = "insert into users (name, email, hash, salt, type)".
+           "values (:name, :email, :hash, :salt, 1)";
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("name", $params->username);
+      $stmt->bindParam("email", $params->email);
+      $stmt->bindParam("hash", $hash);
+      $stmt->bindParam("salt", $salt);
+      $stmt->execute();
+      $auth = $stmt->fetchObject();
+      $id = $db->last_insert_id();
+      $db = null;
+      echoToken($id, $salt);
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
 
@@ -371,32 +430,5 @@
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
      return $dbh;
   }
-
-  // WARNING!
-  // This function exists solely for testing purposes
-  // Code with this functon uncommented should never be commited
-  // under any circumstances. In fact, TODO make this function
-  // dissapear ASAP and replace with a production ready way to
-  // add users
-  /*function addUser($name, $pass) {
-    $salt = hash('sha256', uniqid(mt_rand(),true));
-    $hash = hash('sha256', $pass.$salt);
-    $sql = "insert into users (name, hash, salt, type)".
-           "values (:name, :hash, :salt, 1)";
-    try {
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam("name", $name);
-      $stmt->bindParam("hash", $hash);
-      $stmt->bindParam("salt", $salt);
-      $stmt->execute();
-      $auth = $stmt->fetchObject();
-      $auth->id = $db->last_insert_id();
-      $db = null;
-      echo json_encode($auth);
-    } catch (PDOException $e) {
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
-  }*/
 
 ?>
