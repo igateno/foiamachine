@@ -25,8 +25,9 @@
   // Relations
   $app->get('/relations', 'getRelations');
 
-  // Agency Tabs (Entities and Relations tables)
+  // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
+  $app->post('/requestPreviews', 'requestPreviews');
 
   // Request Log
   $app->post('/requestLog', 'addRequestLog');
@@ -249,11 +250,11 @@
 
   //////////////////////////////////////////////////////////////////////////
   //
-  // Agency Tabs
+  // Entities and Requests
   //
   // The functions below use the entities and relations tables to populate
   // the agencies suggested to the user during the request composition
-  // process.
+  // process and then the previews of requests made by the user.
   //
   /////////////////////////////////////////////////////////////////////////
 
@@ -301,6 +302,53 @@
       }
 
       echo json_encode($tabs);
+    }
+  }
+
+  function requestPreviewsQuery() {
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+    $results = null;
+
+    $sql = file_get_contents('../db/queries/write_requests.sql');
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('id', $params->id);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+    } catch (PDOException $e) {
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+
+    return $results;
+  }
+
+  function requestPreviews() {
+    if (!validateToken()) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $results = requestPreviewsQuery();
+
+    if (!$results) {
+      // TODO
+    } else {
+      $previews = array();
+      $previews['agencies'] = array();
+      $previews['doctypes'] = array();
+      foreach ($results as $result) {
+        if (!array_key_exists('question', $previews))
+          $previews['question'] = $result->question;
+        if (!array_key_exists($result->agency_id, $previews['agencies']))
+          $previews['agencies'][$result->agency_id] = $result->agency_name;
+        if (!array_key_exists($result->doctype_id, $previews['doctypes']))
+          $previews['doctypes'][$result->doctype_id] = $result->doctype_name;
+      }
+
+      echo json_encode($previews);
     }
   }
 

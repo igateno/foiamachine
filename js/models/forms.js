@@ -14,9 +14,14 @@ var FoiaCollection = Backbone.Collection.extend({
   },
 
   idForName: function (name) {
-    return _.find(this.models, function(model){
+    var country = _.find(this.models, function(model){
       return model.get('name') == name;
-    }, this).get('id');
+    }, this);
+    if (typeof(country) == 'undefined') {
+      return null;
+    } else {
+      return country.get('id');
+    }
   }
 
 });

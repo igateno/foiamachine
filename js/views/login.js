@@ -73,7 +73,7 @@ var LoginView = Backbone.View.extend({
       this.alert(false, 'Email cannot be blank.');
       return;
     }
-    if ($('#register .password1 input').val().length > 8) {
+    if ($('#register .password1 input').val().length < 8) {
       this.alert(false, 'Passwords must be at least 8 characters.');
       return;
     }

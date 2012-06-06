@@ -84,6 +84,7 @@ var FOIARouter = Backbone.Router.extend({
 var templates = [
   'header',
   'request',
+  'letters/us',
   'agency-tab',
   'agency-div',
   'agency-checkbox',

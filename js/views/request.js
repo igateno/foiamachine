@@ -16,10 +16,11 @@ var RequestView = Backbone.View.extend({
 
   partials: {
     doc_buttons: '<button id="<%= id %>" class="btn"><%= name %></button>',
+    tabs: '<li><a data-target="#<%= div_id %>" data-toggle="tab"><%= agency %></a></li>'
   },
 
   render: function() {
-    $(this.el).html(this.template(this.model.toJSON()));
+    $(this.el).addClass('row-fluid').html(this.template(this.model.toJSON()));
 
     this.countries = new CountryCollection();
     this.countries.fetch();
@@ -46,8 +47,14 @@ var RequestView = Backbone.View.extend({
 
     if ($('#new-request input.country').val().length == 0) return;
 
-    var cname = $('#new-request input.country').val();
-    this.model.set('country', this.countries.idForName(cname));
+    var cid = this.countries.idForName($('#new-request input.country').val());
+    if (cid == null) {
+      // TODO alert
+      console.log('sanity check');
+      return;
+    }
+
+    this.model.set('country', cid);
 
     this.append_next(e, '#topic-template');
 
@@ -91,7 +98,7 @@ var RequestView = Backbone.View.extend({
     this.model.save(null, {
       success: function (model, response) {
         self.model.set('id', response.id);
-        self.model.fetchTabs(function() {
+        self.model.fetchSuggestions(function() {
           self.append_next(e, '#agency-template');
           _.each(self.model.get('suggestions'), self.build_tabs, self);
         });
@@ -148,11 +155,29 @@ var RequestView = Backbone.View.extend({
     $(e.target).attr('id');
   },
 
-  get_date: function (str) {
+  get_date: function(str) {
     var year = $('span.date-container.' + str + ' select.year').val();
     var month = $('span.date-container.' + str + ' select.month').val();
     var day = $('span.date-container.' + str + ' select.day').val();
     return year + '-' + month + '-' + day;
+  },
+
+  generate_previews: function (prev) {
+    _.each(prev.agencies, function (element, index, list) {
+      var tab_template = _.template(this.partials.tabs);
+      $('#request-preview ul').append(tab_template({
+        div_id: index,
+        agency: element
+      }));
+
+      var div_template = _.template(tpl.get('letters/us'));
+      $('#request-preview .tab-content').append(div_template({
+        div_id: index,
+        agency_name: element,
+        docs: prev.doctypes,
+        question: prev.question
+      }));
+    }, this);
   },
 
   preview_request: function(e) {
@@ -161,12 +186,16 @@ var RequestView = Backbone.View.extend({
     this.model.set('end', this.get_date('end'));
 
     this.model.setDoctypes($('.btn-group button.active'));
+
+    var self = this;
     this.model.save(null, {
-      success: function (model, response) {
-        // TODO display preview of request on page?
-        console.log('yeah, baby!');
+      success: function(model, response) {
+        self.model.fetchPreviews(function() {
+          self.generate_previews(self.model.get('previews'));
+          $('#request-preview .tab-pane:first').addClass('active');
+        });
       },
-      error: function (model, response) {
+      error: function(model, response) {
         // TODO
       }
     });
