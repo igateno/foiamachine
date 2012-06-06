@@ -135,7 +135,18 @@ var RequestView = FOIAView.extend({
       return;
     }
 
-    this.model.setAgencies($('#agencies :checkbox:checked'));
+    var self = this;
+    this.model.setAgencies($('#agencies :checkbox:checked'),
+      {
+        success: function() {
+          // nothing?
+        },
+        error: function() {
+          self.alert(false,
+            "Oops! Something went wrong while saving your selected agencies.");
+        }
+      }
+    );
     this.append_next(e, '#question-template');
   },
 
@@ -211,9 +222,19 @@ var RequestView = FOIAView.extend({
     this.model.set('start', this.get_date('start'));
     this.model.set('end', this.get_date('end'));
 
-    this.model.setDoctypes($('.btn-group button.active'));
-
     var self = this;
+    this.model.setDoctypes($('.btn-group button.active'),
+      {
+        success: function() {
+          // nothing?
+        },
+        error: function() {
+          self.alert(false,
+            "Oops! Something went wrong while saving your selected documents.");
+        }
+      }
+    );
+
     this.model.save(null, {
       success: function(model, response) {
         self.model.fetchPreviews({

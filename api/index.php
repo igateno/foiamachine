@@ -288,7 +288,7 @@
     $results = agencyTabsQuery();
 
     if (!$results) {
-      echo '{"error":"Database query returned no results in agencyTabs."}'
+      echo '{"error":"Database query returned no results in agencyTabs."}';
     } else {
       $tabs = array();
       foreach ($results as $result) {

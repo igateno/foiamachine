@@ -94,23 +94,50 @@ var Request = Backbone.Model.extend({
     });
   },
 
-  setAgencies: function(checkboxes) {
+  setAgencies: function(checkboxes, callbacks) {
     this.set('agencies', new RequestAgencyCollection())
     _.each(checkboxes, function(element, index, list) {
-      this.get('agencies').create({
+      this.get('agencies').create(
+      {
         request_log_id: this.id,
         agency_id: element.id
+      },
+      {
+        success: function(model, response) {
+          if (response && response.error) {
+            callbacks.error();
+          } else {
+            callbacks.success();
+          }
+        },
+        error: function(model, response) {
+          callbacks.error()
+        }
       });
     }, this);
   },
 
-  setDoctypes: function(buttons) {
+  setDoctypes: function(buttons, callbacks) {
     this.set('doctypes', new RequestDoctypeCollection())
     _.each(buttons, function(element, index, list) {
-      this.get('doctypes').create({
+      this.get('doctypes').create(
+      {
         request_log_id: this.id,
         doctype_id: $(element).attr('id')
-      });
+      },
+      {
+        success: function(model, response) {
+          if (response && response.error) {
+            callbacks.error();
+          } else {
+            callbacks.success();
+          }
+        },
+        error: function(model, response) {
+          callbacks.error()
+        }
+      }
+      );
     }, this);
   }
 });
