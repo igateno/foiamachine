@@ -1,0 +1,3 @@
+MAILTO="requestengine@foiamachine.org"
+*/2 * * * * /usr/local/bin/php ~/foiamachine/api/mailer.php
+*/5 * * * * /usr/local/bin/php ~/foiamachine/api/mailcheck.php
