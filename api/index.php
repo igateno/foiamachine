@@ -19,6 +19,7 @@
   $app->post('/entities', 'addEntity');
 
   $app->get('/countries', 'getCountries');
+  $app->get('/agencies', 'getAgencies');
   $app->get('/topics', 'getTopics');
   $app->get('/doctypes', 'getDoctypes');
 
@@ -192,6 +193,10 @@
 
   function getCountries() {
     getEntitiesByType(1);
+  }
+
+  function getAgencies() {
+    getEntitiesByType(2);
   }
 
   function getTopics() {

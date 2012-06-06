@@ -126,6 +126,37 @@ var CCFormView = FOIAView.extend({
 
 });
 
+var CATFormView = FOIAView.extend({
+
+  initialize: function() {
+    this.template = _.template($('#cat-template').html());
+  },
+
+  render: function() {
+    $(this.el).html(this.template());
+
+    this.countries = new CountryCollection();
+    this.countries.fetch();
+    this.$('input.country').typeahead({
+      source: this.countries.nameArray()
+    });
+
+    this.agencies = new AgencyCollection();
+    this.agencies.fetch();
+    this.$('input.agency').typeahead({
+      source: this.agencies.nameArray()
+    });
+
+    this.topics = new TopicCollection();
+    this.topics.fetch();
+    this.$('input.topic').typeahead({
+      source: this.topics.nameArray()
+    });
+    return this;
+  }
+
+});
+
 var FormsView = Backbone.View.extend({
 
   initialize: function() {
@@ -158,6 +189,10 @@ var FormsView = Backbone.View.extend({
       this.ccFormView = new CCFormView({model: relation});
     }
     $('#new-cc-relation').append(this.ccFormView.render().el);
+    if (!this.catFormView) {
+      this.catFormView = new CATFormView();
+    }
+    $('#new-cat-relation').append(this.catFormView.render().el);
   },
 
 });

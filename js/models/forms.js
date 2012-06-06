@@ -95,6 +95,14 @@ var CountryCollection = FoiaCollection.extend({
 
 });
 
+var AgencyCollection = FoiaCollection.extend({
+
+  model: Entity.extend({type:2}),
+
+  url: 'api/agencies',
+
+});
+
 var TopicCollection = FoiaCollection.extend({
 
   model: Entity.extend({type:3}),

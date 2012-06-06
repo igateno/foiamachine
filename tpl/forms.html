@@ -20,6 +20,10 @@
     <h2>New Country-Country</h2>
   </div> <!-- new-cc-relation -->
 
+  <div id="new-cat-relation">
+    <h2>New Country-Agency-Topic</h2>
+  </div>
+
 </div> <!-- relation-inserts -->
 
 <!-- Form to insert a new entity -->
@@ -42,9 +46,39 @@
 <script id="cc-template" type="text/template">
   <form>
     <fieldset>
-      <input class="country c1" type="text" data-provide="typeahead">
+      <input class="country c1"
+             type="text"
+             data-provide="typeahead"
+             placeholder="Country">
       <p>knows about</p>
-      <input class="country c2" type="text" data-provide="typeahead">
+      <input class="country c2"
+             type="text"
+             data-provide="typeahead"
+             placeholder="Country">
+    </fieldset>
+
+    <div>
+      <a class="btn add-cc">Add</a>
+    </div>
+  </form>
+</script>
+
+<!-- form to add a new country-agency-topic relation -->
+<script id="cat-template" type="text/template">
+  <form>
+    <fieldset>
+      <input class="country"
+             type="text"
+             data-provide="typeahead"
+             placeholder="Country">
+      <input class="agency"
+             type="text"
+             data-provide="typeahead"
+             placeholder="Agency">
+      <input class="topic"
+             type="text"
+             data-provide="typeahead"
+             placeholder="Topic">
     </fieldset>
 
     <div>
