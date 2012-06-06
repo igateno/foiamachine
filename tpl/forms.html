@@ -1,9 +1,5 @@
 <div id="entity-inserts" class="span3">
 
-  <div id="alert-container">
-    <span id="feedback"></span>
-  </div>
-
   <div id="new-country">
     <h2>New Country</h2>
   </div>
@@ -16,15 +12,15 @@
     <h2>New Topic</h2>
   </div>
 
-</div>
+</div> <!-- entity-inserts -->
 
-<!-- Alert on success or error -->
-<script id="alert-template" type="text-template">
-  <div class="alert">
-    <button class="close" data-dismiss="alert">x</button>
-    <span class="message"></span>
-  </div> <!-- alert -->
-</script>
+<div id="relation-inserts" class="span3">
+
+  <div id="new-cc-relation">
+    <h2>New Country-Country</h2>
+  </div> <!-- new-cc-relation -->
+
+</div> <!-- relation-inserts -->
 
 <!-- Form to insert a new entity -->
 <script id="new-entity-template" type="text/template">
@@ -38,6 +34,21 @@
 
     <div>
       <a class="btn add-entity">Add</a>
+    </div>
+  </form>
+</script>
+
+<!-- form to add a new country-country relation -->
+<script id="cc-template" type="text/template">
+  <form>
+    <fieldset>
+      <input class="country c1" type="text" data-provide="typeahead">
+      <p>knows about</p>
+      <input class="country c2" type="text" data-provide="typeahead">
+    </fieldset>
+
+    <div>
+      <a class="btn add-cc">Add</a>
     </div>
   </form>
 </script>

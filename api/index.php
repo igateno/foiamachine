@@ -24,6 +24,7 @@
 
   // Relations
   $app->get('/relations', 'getRelations');
+  $app->post('/relations', 'addRelation');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
@@ -201,6 +202,52 @@
     getEntitiesByType(4);
   }
 
+  function addRelation(){
+    $id = validateToken();
+    if (!$id) {
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = "insert into relations (id1, id2, type) values(:id1, :id2, :type)";
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("id1", $params->id1);
+      $stmt->bindParam("id2", $params->id2);
+      $stmt->bindParam("type", $params->type);
+      $stmt->execute();
+      $db = null;
+      echo '{"status":"ok"}';
+    }catch(PDOException $e){
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Relations
+  //
+  /////////////////////////////////////////////////////////////////////////
+
+  function getRelations(){
+     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
+       "from entities as e1, entities as e2, relations as r " .
+       "where e1.id = r.id1 and e2.id = r.id2;";
+     try{
+        $db = getConnection();
+        $stmt = $db->query($sql);
+        $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        echo json_encode($relations);
+     }catch(PDOException $e){
+        echo '{"error":{"text":'.$e->getMessage().'}}';
+     }
+  }
+
   function addEntity(){
     $id = validateToken();
     if (!$id) {
@@ -223,27 +270,6 @@
         echo json_encode($entity);
      }catch(PDOException $e){
         error_log($e->getMessage()."\n", 3, '/var/tmp/php.log');
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  // Relations
-  //
-  /////////////////////////////////////////////////////////////////////////
-
-  function getRelations(){
-     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
-       "from entities as e1, entities as e2, relations as r " .
-       "where e1.id = r.id1 and e2.id = r.id2;";
-     try{
-        $db = getConnection();
-        $stmt = $db->query($sql);
-        $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($relations);
-     }catch(PDOException $e){
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
@@ -485,7 +511,7 @@
   // Mail Request
   //
   /////////////////////////////////////////////////////////////////////////
-  
+
   function sendMail($to, $subject, $message){
       $message = wordwrap($message, 70);
       mail($to, $subject, $message);

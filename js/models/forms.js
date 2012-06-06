@@ -57,7 +57,27 @@ var EntityCollection = Backbone.Collection.extend({
 
 });
 
-var Relation = Backbone.Model.extend();
+/*
+ * Relation Types
+ * knows about - 1
+ * country-agency - 2
+ * topic-agency - 3
+ */
+var Relation = Backbone.Model.extend({
+
+  urlRoot:'api/relations',
+
+  defaults: function() {
+    return {
+      id1: 0,
+      id2: 0,
+      type: 0,
+      username: $.cookie('username'),
+      token: $.cookie('token')
+    }
+  }
+
+});
 
 var RelationCollection = Backbone.Collection.extend({
 
