@@ -132,6 +132,11 @@ var CATFormView = FOIAView.extend({
     this.template = _.template($('#cat-template').html());
   },
 
+  events: {
+    'click #new-cat-relation a.add-cat':'addCAT',
+    'keypress #new-cat-relation input':'addCATEnter'
+  },
+
   render: function() {
     $(this.el).html(this.template());
 
@@ -153,6 +158,42 @@ var CATFormView = FOIAView.extend({
       source: this.topics.nameArray()
     });
     return this;
+  },
+
+  addCAT: function(e) {
+    e.preventDefault();
+
+    if ($('#new-cat-relation input.country').val().length == 0) {
+      this.alert(false, 'Please enter a country for this relation.');
+      return;
+    }
+
+    if ($('#new-cat-relation input.agency').val().length == 0) {
+      this.alert(false, 'Please enter an agency for this relation.');
+      return;
+    }
+
+    if ($('#new-cat-relation input.topic').val().length == 0) {
+      this.alert(false, 'Please enter a topic for this relation.');
+      return;
+    }
+
+    var cid =
+      this.countries.idForName($('#new-cat-relation input.country').val());
+    var aid =
+      this.agencies.idForName($('#new-cat-relation input.agency').val());
+    var tid = this.topics.idForName($('#new-cat-relation input.topic').val());
+
+    if (!cid || !aid || !tid) {
+      this.alert(false, 'Please use values from the typeahead.');
+      return;
+    }
+
+    this.alert(true, 'Coo');
+  },
+
+  addCATEnter: function(e) {
+    if (e.keyCode == 13) this.addCAT(e);
   }
 
 });
