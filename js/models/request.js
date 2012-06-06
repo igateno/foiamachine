@@ -2,13 +2,14 @@ var RequestAgency = Backbone.Model.extend({
 
   urlRoot: 'api/requestAgencies',
 
-  defaults: {
-    username: $.cookie('username'),
-    token: $.cookie('token'),
-    request_log_id: null,
-    agency_id: null
+  defaults: function() {
+    return {
+      username: $.cookie('username'),
+      token: $.cookie('token'),
+      request_log_id: null,
+      agency_id: null
+    }
   }
-
 });
 
 var RequestAgencyCollection = FoiaCollection.extend({
@@ -23,13 +24,14 @@ var RequestDoctype = Backbone.Model.extend({
 
   urlRoot: 'api/requestDoctypes',
 
-  defaults: {
-    username: $.cookie('username'),
-    token: $.cookie('token'),
-    request_log_id: null,
-    doctype_id: null
+  defaults: function() {
+    return {
+      username: $.cookie('username'),
+      token: $.cookie('token'),
+      request_log_id: null,
+      doctype_id: null
+    }
   }
-
 });
 
 var RequestDoctypeCollection = FoiaCollection.extend({
