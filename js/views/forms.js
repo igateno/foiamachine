@@ -55,7 +55,7 @@ var FormsView = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(this.template());
+    $(this.el).addClass('row-fluid').html(this.template());
     return this;
   },
 
