@@ -1,4 +1,4 @@
-var RequestView = Backbone.View.extend({
+var RequestView = FOIAView.extend({
 
   initialize: function() {
     this.template = _.template(tpl.get('request'));
@@ -45,12 +45,14 @@ var RequestView = Backbone.View.extend({
   load_topics: function(e) {
     e.preventDefault();
 
-    if ($('#new-request input.country').val().length == 0) return;
+    if ($('#new-request input.country').val().length == 0) {
+      this.alert(false, 'Please, start by typing in a country name.');
+      return;
+    }
 
     var cid = this.countries.idForName($('#new-request input.country').val());
     if (cid == null) {
-      // TODO alert
-      console.log('sanity check');
+      this.alert(false, 'Invalid country name.');
       return;
     }
 
@@ -89,12 +91,21 @@ var RequestView = Backbone.View.extend({
   load_tabs: function(e) {
     e.preventDefault();
 
-    if ($('#new-request input.topic').val().length == 0) return;
+    if ($('#new-request input.topic').val().length == 0) {
+      this.alert(false, 'What is your request about?');
+      return;
+    }
 
     var self = this;
 
-    var tname = $('#new-request input.topic').val();
-    this.model.set('topic', this.topics.idForName(tname));
+    var tid = this.topics.idForName($('#new-request input.topic').val());
+
+    if (tid == null) {
+      this.alert(false, 'Invalid topic.');
+      return;
+    }
+
+    this.model.set('topic', tid);
     this.model.save(null, {
       success: function (model, response) {
         self.model.set('id', response.id);
@@ -112,6 +123,12 @@ var RequestView = Backbone.View.extend({
 
   load_question: function(e) {
     e.preventDefault();
+
+    if ($('#agencies :checkbox:checked').length == 0) {
+      this.alert(false, 'Please select at least one agency.');
+      return;
+    }
+
     this.model.setAgencies($('#agencies :checkbox:checked'));
     this.append_next(e, '#question-template');
   },
@@ -119,7 +136,10 @@ var RequestView = Backbone.View.extend({
   load_datepickers: function(e) {
     e.preventDefault();
 
-    if ($('#new-request textarea').val().length == 0) return;
+    if ($('#new-request textarea').val().length == 0) {
+      this.alert(false, 'What question would you like to ask?');
+      return;
+    }
 
     var self = this;
 
