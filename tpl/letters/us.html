@@ -1,0 +1,51 @@
+<!-- Letter template for US FOIA request -->
+<!-- Language taken from http://www2.ed.gov/policy/gen/leg/foia/templates/foia_request_template.pdf -->
+<div class="tab-pane" id="<%= div_id %>">
+  <p><%= agency_name %></p>
+  <p>Dear FOIA Public Liason</p>
+  <p>This is a request under the Freedom of Information Act</p>
+  <p>
+    I request that a copy of all
+    <% _.each(docs, function (element, index, list) {  %>
+      <%= element %>,
+    <% }); %>
+    containing the following information be delivered to me:
+  </p>
+  <p><%= question %></p>
+
+  <!-- Journalist users should have a paragraph that says:
+    In order to determine my status to assess fees, you should know that I am
+    a representative of the news media/press and this request is being made as
+    part of news gathering and not for commercial use. -->
+
+  <!-- Paragraph for restricted users -->
+  <p>
+    In order to determine my status to assess fees, you should know that this
+    request is being made through foiamachine.org and the resulting documents
+    will be made available to the public for noncommercial use.
+  </p>
+
+  <p>
+    I request a waiver of all fees for this request. Disclosure of the
+    requested information to me is in the public interest because it is likely
+    to contribute significantly to public understanding of the operations or
+    activities of the government and is not primarily in my commercial interest.
+  </p>
+  <p>
+    FOIA Machine is a tool that facilitates the process of making Freedom of
+    Information Act requests. The service is available for free to non-commercial
+    users. In return for this free service, all documents returned to such a
+    user will be made publicly available at foiamachine.org.
+  </p>
+  <p>Thank you for your consideration of this request.</p>
+  <p>Sincerely,</p>
+  <p>Mr. F. Machine User</p>
+  <!--
+    First Name*
+    Middle Initial
+    Last Name*
+    Daytime phone*
+    Fax
+    Email
+  -->
+<div>
