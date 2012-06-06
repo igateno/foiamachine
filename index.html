@@ -28,16 +28,23 @@
     <header></header>
 
     <div class="container-fluid">
-    <div id="container" class="row-fluid"></div>
-    </div> <!-- container-fluid -->
+      <div class="row-fluid">
+        <div class="span12">
+          <div id="alert-container">
+          </div> <!-- alert-container -->
+        </div> <!-- span12 -->
+      </div> <!-- row-fluid -->
 
-    <!-- feedback alert -->
-    <script id="alert-template" type="text/template">
-      <div class="alert">
-        <button class="close" data-dismiss="alert">x</button>
-        <span class="message"></span>
-      </div>
-    </script>
+      <div id="container" class="row-fluid"></div>
+      </div> <!-- container-fluid -->
+
+<!-- feedback alert -->
+<script id="alert-template" type="text/template">
+  <div class="alert">
+    <button class="close" data-dismiss="alert">x</button>
+    <span class="message"></span>
+  </div>
+</script>
 
 <script type="text/javascript" src="js/libs/jquery-1.7.2.min.js"></script>
 <script type="text/javascript" src="js/libs/json/json2.js"></script>
