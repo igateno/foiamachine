@@ -38,11 +38,13 @@ var Entity = Backbone.Model.extend({
 
   urlRoot:'api/entities',
 
-  defaults: {
-    name: '',
-    type: 0,
-    username: $.cookie('username'),
-    token: $.cookie('token')
+  defaults: function() {
+    return {
+      name: '',
+      type: 0,
+      username: $.cookie('username'),
+      token: $.cookie('token')
+    }
   },
 
 });

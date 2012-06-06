@@ -1,11 +1,11 @@
-var EntityFormView = Backbone.View.extend({
+var EntityFormView = FOIAView.extend({
 
   initialize: function() {
     this.template = _.template($('#new-entity-template').html());
   },
 
   events: {
-    'click a.add-entity': 'addCountry',
+    'click a.add-entity': 'addEntity',
     'keypress input.name': 'countryEnter'
   },
 
@@ -14,7 +14,7 @@ var EntityFormView = Backbone.View.extend({
     return this;
   },
 
-  addCountry: function(e) {
+  addEntity: function(e) {
     e.preventDefault();
 
     if (this.$('input.name').val().length == 0)
@@ -26,19 +26,24 @@ var EntityFormView = Backbone.View.extend({
     });
     this.prevType = this.model.get('type');
     this.model.save(null, {
-      success: function(model) {
-        self.model = new Entity({type:self.prevType});
-        self.render();
-        $('#feedback').html('Success!');
+      success: function(model, response) {
+        if (response.error) {
+          self.alert(false, 'Error adding entity.');
+          // disable forms?
+        } else {
+          self.model = new Entity({type:self.prevType});
+          self.render();
+          self.alert(true, 'Successfully added entity.');
+        }
       },
-      error: function() {
-        $('#feedback').html('Error adding entity.');
+      error: function(model, response) {
+        self.alert(false, 'Error adding entity.');
       }
     });
   },
 
   countryEnter: function(e) {
-    if (e.keyCode == 13) this.addCountry(e);
+    if (e.keyCode == 13) this.addEntity(e);
   }
 
 });
