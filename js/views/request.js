@@ -113,6 +113,7 @@ var RequestView = FOIAView.extend({
           success: function() {
             self.append_next(e, '#agency-template');
             _.each(self.model.get('suggestions'), self.build_tabs, self);
+            $('#agency-tabs a:first').tab('show');
           },
           error: function() {
             self.alert(false,
@@ -240,6 +241,7 @@ var RequestView = FOIAView.extend({
         self.model.fetchPreviews({
           success: function() {
             self.generate_previews(self.model.get('previews'));
+            $('#request-preview .nav-tabs a:first').tab('show');
           },
           error: function() {
             self.alert(false,
