@@ -288,7 +288,7 @@
     $results = agencyTabsQuery();
 
     if (!$results) {
-      // TODO echo error message? did that not happen already?
+      echo '{"error":"Database query returned no results in agencyTabs."}'
     } else {
       $tabs = array();
       foreach ($results as $result) {
@@ -326,7 +326,8 @@
   }
 
   function requestPreviews() {
-    if (!validateToken()) {
+    $id = validateToken();
+    if (!$id) {
       echo '{"error": "invalid token"}';
       return;
     }
@@ -334,7 +335,7 @@
     $results = requestPreviewsQuery();
 
     if (!$results) {
-      // TODO
+      echo '{"error":"Database query produced no results in requestPreviews."}';
     } else {
       $previews = array();
       $previews['agencies'] = array();

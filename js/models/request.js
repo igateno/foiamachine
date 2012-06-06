@@ -59,7 +59,7 @@ var Request = Backbone.Model.extend({
     this.set('token', $.cookie('token'));
   },
 
-  fetchSuggestions: function(callback) {
+  fetchSuggestions: function(callbacks) {
     var self = this;
     $.ajax({
       url: 'api/agencyTabs',
@@ -67,12 +67,16 @@ var Request = Backbone.Model.extend({
       data: JSON.stringify(this),
       dataType: 'json'
     }).done(function(results) {
-      self.set('suggestions', results);
-      callback();
+      if (results.error) {
+        callbacks.error();
+      } else {
+        self.set('suggestions', results);
+        callbacks.success();
+      }
     });
   },
 
-  fetchPreviews: function(callback) {
+  fetchPreviews: function(callbacks) {
     var self = this;
     $.ajax({
       url: 'api/requestPreviews',
@@ -80,8 +84,13 @@ var Request = Backbone.Model.extend({
       data: JSON.stringify(this),
       dataType: 'json'
     }).done(function(results) {
-      self.set('previews', results);
-      callback();
+      if (results.error) {
+        // TODO log error
+        callbacks.error();
+      } else {
+        self.set('previews', results);
+        callbacks.success();
+      }
     });
   },
 

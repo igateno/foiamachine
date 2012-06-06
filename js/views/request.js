@@ -109,13 +109,19 @@ var RequestView = FOIAView.extend({
     this.model.save(null, {
       success: function (model, response) {
         self.model.set('id', response.id);
-        self.model.fetchSuggestions(function() {
-          self.append_next(e, '#agency-template');
-          _.each(self.model.get('suggestions'), self.build_tabs, self);
+        self.model.fetchSuggestions({
+          success: function() {
+            self.append_next(e, '#agency-template');
+            _.each(self.model.get('suggestions'), self.build_tabs, self);
+          },
+          error: function() {
+            self.alert(false,
+              "Oops! Somethind went wrong while loading suggestions");
+          }
         });
       },
       error: function (model, response) {
-        // TODO
+        self.alert(false, "Well, that wasn't supposed to happen...");
       }
     });
 
@@ -165,7 +171,7 @@ var RequestView = FOIAView.extend({
         });
       },
       error: function (model, response) {
-        // TODO
+        self.alert(false, "Well, that wasn't supposed to happen...");
       }
     });
   },
@@ -210,13 +216,18 @@ var RequestView = FOIAView.extend({
     var self = this;
     this.model.save(null, {
       success: function(model, response) {
-        self.model.fetchPreviews(function() {
-          self.generate_previews(self.model.get('previews'));
-          $('#request-preview .tab-pane:first').addClass('active');
+        self.model.fetchPreviews({
+          success: function() {
+            self.generate_previews(self.model.get('previews'));
+          },
+          error: function() {
+            self.alert(false,
+              "Oops! Something went wrong while generating your requests...");
+          }
         });
       },
       error: function(model, response) {
-        // TODO
+        self.alert(false, "Well, that wasn't supposed to happen...");
       }
     });
   }
