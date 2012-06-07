@@ -1,6 +1,35 @@
-var CATTableView = FOIAView.extend({
+var CCTableView = FOIAView.extend({
 
-  el: $('#relations .cat'),
+  partials: {
+    row: '<tr><td><%= name1 %></td><td>knows about</td><td><%= name2 %></td></tr>'
+  },
+
+  render: function() {
+    if (!this.model) {
+      this.alert(false, 'Error displaying the page.');
+      return;
+    }
+
+    var self = this;
+    this.model.fetch({
+      success: function (model, response) {
+        _.each(response, function (element, index, list) {
+          var template = _.template(this.partials.row);
+          $('#relations .cc tbody').append(template({
+            name1: element.name1,
+            name2: element.name2
+          }));
+        }, self);
+      },
+      error: function () {
+        this.alert(false, 'Error displaying the page.');
+      }
+    });
+  }
+
+});
+
+var CATTableView = FOIAView.extend({
 
   partials: {
     row: '<tr><td><%= country %></td><td><%= agency %></td><td><%= topic %></td></tr>'
@@ -9,12 +38,12 @@ var CATTableView = FOIAView.extend({
   render: function() {
     if (!this.model) {
       this.alert(false, 'Error displaying the page.');
+      return;
     }
 
     var self = this;
     this.model.fetch({
       success: function (model, response) {
-        console.log(this.el);
         _.each(response, function(element, index, list) {
           var template = _.template(this.partials.row);
           $('#relations .cat tbody').append(template({
@@ -170,7 +199,7 @@ var CCFormView = FOIAView.extend({
     },
     {
       success: function(model, response) {
-        self.model = new Relation({type: type});
+        self.model = new CCRelation({type: type});
         self.render();
         self.alert(true, 'Successfully added Country-Country relation.');
       },
@@ -305,12 +334,12 @@ var FormsView = Backbone.View.extend({
       this.topicFormView = new EntityFormView({model:topic});
     }
     $('#new-topic').append(this.topicFormView.render().el);
-    if (!this.ccFormView) {
-      var relation = new Relation({type: 1});
-      this.ccFormView = new CCFormView({model: relation});
-    }
 
     // These populate forms for new relations
+    if (!this.ccFormView) {
+      var relation = new CCRelation({type: 1});
+      this.ccFormView = new CCFormView({model: relation});
+    }
     $('#new-cc-relation').append(this.ccFormView.render().el);
     if (!this.catFormView) {
       var catRelation = new CATRelationModel();
@@ -336,6 +365,11 @@ var FormsView = Backbone.View.extend({
     $('#entities .topic-table').html(this.topicTableView.render().el);
 
     // These populate the database lookup tables for relations
+    if (!this.ccTableView) {
+      var ccCollection = new CCRelationCollection();
+      this.ccTableView = new CCTableView({model: ccCollection});
+    }
+    this.ccTableView.render();
     if (!this.catTableView) {
       var catCollection = new CATCollection();
       this.catTableView = new CATTableView({model: catCollection});

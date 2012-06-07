@@ -63,9 +63,10 @@ var EntityCollection = Backbone.Collection.extend({
  * country-agency - 2
  * topic-agency - 3
  */
-var Relation = Backbone.Model.extend({
 
-  urlRoot:'api/relations',
+var CCRelation = Backbone.Model.extend({
+
+  urlRoot:'api/ccRelations',
 
   defaults: function() {
     return {
@@ -79,11 +80,11 @@ var Relation = Backbone.Model.extend({
 
 });
 
-var RelationCollection = Backbone.Collection.extend({
+var CCRelationCollection = Backbone.Collection.extend({
 
-  model: Relation,
+  model: CCRelation,
 
-  url:"api/relations"
+  url:"api/ccRelations"
 
 });
 

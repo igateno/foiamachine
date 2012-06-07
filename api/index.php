@@ -25,8 +25,8 @@
   $app->get('/doctypes', 'getDoctypes');
 
   // Relations
-  $app->get('/relations', 'getRelations');
-  $app->post('/relations', 'addRelation');
+  $app->get('/ccRelations', 'getCCRelations');
+  $app->post('/ccRelations', 'addCCRelation');
   $app->get('/catRelations', 'getCATRelations');
   $app->post('/catRelations', 'addCATRelation');
 
@@ -247,10 +247,9 @@
   //
   /////////////////////////////////////////////////////////////////////////
 
-  function getRelations(){
-     $sql = "select e1.name as name1, r.type, e2.name as name2 " .
-       "from entities as e1, entities as e2, relations as r " .
-       "where e1.id = r.id1 and e2.id = r.id2;";
+  function getCCRelations(){
+     $sql = file_get_contents('../db/queries/ccrelations.sql');
+
      try{
         $db = getConnection();
         $stmt = $db->query($sql);
@@ -263,7 +262,7 @@
      }
   }
 
-  function addRelation(){
+  function addCCRelation(){
     $id = validateToken();
     if (!$id) {
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
