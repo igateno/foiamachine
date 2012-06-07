@@ -30,14 +30,9 @@ var EntityFormView = FOIAView.extend({
     this.prevType = this.model.get('type');
     this.model.save(null, {
       success: function(model, response) {
-        if (response.error) {
-          self.alert(false, 'Error adding entity.');
-          // disable forms?
-        } else {
-          self.model = new Entity({type:self.prevType});
-          self.render();
-          self.alert(true, 'Successfully added entity.');
-        }
+        self.model = new Entity({type:self.prevType});
+        self.render();
+        self.alert(true, 'Successfully added entity.');
       },
       error: function(model, response) {
         self.alert(false, 'Error adding entity.');
@@ -104,14 +99,9 @@ var CCFormView = FOIAView.extend({
     },
     {
       success: function(model, response) {
-        if (response.error) {
-          self.alert(false,
-            'Oops! Something went wrong saving that relation!');
-        } else {
-          self.model = new Relation({type: type});
-          self.render();
-          self.alert(true, 'Successfully added Country-Country relation.');
-        }
+        self.model = new Relation({type: type});
+        self.render();
+        self.alert(true, 'Successfully added Country-Country relation.');
       },
       error: function(model, response) {
         self.alert(false, 'Oops! Something went wrong saving that relation!');
@@ -189,7 +179,24 @@ var CATFormView = FOIAView.extend({
       return;
     }
 
-    this.alert(true, 'Coo');
+    var self = this;
+
+    this.model.set({
+      cid: cid,
+      aid: aid,
+      tid: tid
+    });
+    this.model.addCATRelation({
+      success: function() {
+        self.model = new CATRelationModel();
+        self.render();
+        self.alert(true, 'Successfully added relation.');
+      },
+      error: function () {
+        self.alert(false,
+          'Oops! Something went wrong when saving this relation.');
+      }
+    });
   },
 
   addCATEnter: function(e) {
@@ -231,7 +238,8 @@ var FormsView = Backbone.View.extend({
     }
     $('#new-cc-relation').append(this.ccFormView.render().el);
     if (!this.catFormView) {
-      this.catFormView = new CATFormView();
+      var catRelation = new CATRelationModel();
+      this.catFormView = new CATFormView({model:catRelation});
     }
     $('#new-cat-relation').append(this.catFormView.render().el);
   },

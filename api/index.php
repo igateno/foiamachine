@@ -26,6 +26,7 @@
   // Relations
   $app->get('/relations', 'getRelations');
   $app->post('/relations', 'addRelation');
+  $app->post('/catRelations', 'addCATRelation');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
@@ -72,6 +73,7 @@
     try {
       $rslt = userLookup($params->username);
     } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
       return false;
     }
@@ -92,6 +94,7 @@
   }
 
   function echoError($errstr) {
+    header('HTTP/1.0 420 Enhance Your Calm', true, 420);
     echo '{"error":"'.$errstr.'","token":""}';
   }
 
@@ -153,6 +156,7 @@
       $db = null;
       echoToken($id, $salt);
     } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -172,6 +176,7 @@
         $db = null;
         echo json_encode($entities);
      }catch(PDOException $e){
+        header('HTTP/1.0 420 Enhance Your Calm', true, 420);
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
@@ -187,6 +192,7 @@
       $db = null;
       echo json_encode($entities);
     } catch (PDOException $e) {
+      header('HTTP/1.0 400 Bad Request', true, 400);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -207,29 +213,30 @@
     getEntitiesByType(4);
   }
 
-  function addRelation(){
+  function addEntity(){
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
 
-    $request = Slim::getInstance()->request();
-    $params = json_decode($request->getBody());
-
-    $sql = "insert into relations (id1, id2, type) values(:id1, :id2, :type)";
-    try{
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam("id1", $params->id1);
-      $stmt->bindParam("id2", $params->id2);
-      $stmt->bindParam("type", $params->type);
-      $stmt->execute();
-      $db = null;
-      echo '{"status":"ok"}';
-    }catch(PDOException $e){
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
+     $request = Slim::getInstance()->request();
+     $entity = json_decode($request->getBody());
+    $sql = "insert into entities (name, type) values(:name, :type)";
+     try{
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("name", $entity->name);
+        $stmt->bindParam("type", $entity->type);
+        $stmt->execute();
+        $entity->id = $db->lastInsertId();
+        $db = null;
+        echo json_encode($entity);
+     }catch(PDOException $e){
+        header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+        echo '{"error":{"text":'.$e->getMessage().'}}';
+     }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -249,34 +256,64 @@
         $db = null;
         echo json_encode($relations);
      }catch(PDOException $e){
+        header('HTTP/1.0 420 Enhance Your Calm', true, 420);
         echo '{"error":{"text":'.$e->getMessage().'}}';
      }
   }
 
-  function addEntity(){
+  function addRelation(){
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
 
-     error_log('addEntity'."\n", 3, '/var/tmp/php.log');
-     $request = Slim::getInstance()->request();
-     $entity = json_decode($request->getBody());
-    $sql = "insert into entities (name, type) values(:name, :type)";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("name", $entity->name);
-        $stmt->bindParam("type", $entity->type);
-        $stmt->execute();
-        $entity->id = $db->lastInsertId();
-        $db = null;
-        echo json_encode($entity);
-     }catch(PDOException $e){
-        error_log($e->getMessage()."\n", 3, '/var/tmp/php.log');
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = "insert into relations (id1, id2, type) values(:id1, :id2, :type)";
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("id1", $params->id1);
+      $stmt->bindParam("id2", $params->id2);
+      $stmt->bindParam("type", $params->type);
+      $stmt->execute();
+      $db = null;
+      echo '{"status":"ok"}';
+    }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  function addCATRelation() {
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = 'insert into relations (id1, id2, type) values'.
+           '(:cid, :aid, 2), (:tid, :aid, 3)';
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("cid", $params->cid);
+      $stmt->bindParam("aid", $params->aid);
+      $stmt->bindParam("tid", $params->tid);
+      $stmt->execute();
+      $db = null;
+      echo '{"status":"ok"}';
+    }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -304,6 +341,7 @@
       $results = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
     } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
 
@@ -312,6 +350,7 @@
 
   function agencyTabs() {
     if (!validateToken()) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -319,6 +358,7 @@
     $results = agencyTabsQuery();
 
     if (!$results) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":"Database query returned no results in agencyTabs."}';
     } else {
       $tabs = array();
@@ -350,6 +390,7 @@
       $results = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
     } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
 
@@ -359,6 +400,7 @@
   function requestPreviews() {
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -366,6 +408,7 @@
     $results = requestPreviewsQuery();
 
     if (!$results) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":"Database query produced no results in requestPreviews."}';
     } else {
       $previews = array();
@@ -393,6 +436,7 @@
   function addRequestLog() {
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -413,6 +457,7 @@
       $db = null;
       echo json_encode($params);
     }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -420,6 +465,7 @@
   function updateRequestLog() {
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -442,6 +488,7 @@
       $stmt->bindParam('question', $params->question);
       $stmt->execute();
     } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -449,6 +496,7 @@
   function addRequestAgencies() {
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -466,6 +514,7 @@
       $stmt->execute();
       $db = null;
     }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -473,6 +522,7 @@
   function addRequestDoctypes() {
     $id = validateToken();
     if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
     }
@@ -490,6 +540,7 @@
       $stmt->execute();
       $db = null;
     }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }

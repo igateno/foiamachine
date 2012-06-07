@@ -69,12 +69,10 @@ var Request = Backbone.Model.extend({
       data: JSON.stringify(this),
       dataType: 'json'
     }).done(function(results) {
-      if (results.error) {
-        callbacks.error();
-      } else {
-        self.set('suggestions', results);
-        callbacks.success();
-      }
+      self.set('suggestions', results);
+      callbacks.success();
+    }).fail(function() {
+      callbacks.error();
     });
   },
 
@@ -86,13 +84,10 @@ var Request = Backbone.Model.extend({
       data: JSON.stringify(this),
       dataType: 'json'
     }).done(function(results) {
-      if (results.error) {
-        // TODO log error
-        callbacks.error();
-      } else {
-        self.set('previews', results);
-        callbacks.success();
-      }
+      self.set('previews', results);
+      callbacks.success();
+    }).fail(function() {
+      callbacks.error();
     });
   },
 
@@ -106,11 +101,7 @@ var Request = Backbone.Model.extend({
       },
       {
         success: function(model, response) {
-          if (response && response.error) {
-            callbacks.error();
-          } else {
-            callbacks.success();
-          }
+          callbacks.success();
         },
         error: function(model, response) {
           callbacks.error()
@@ -129,11 +120,7 @@ var Request = Backbone.Model.extend({
       },
       {
         success: function(model, response) {
-          if (response && response.error) {
-            callbacks.error();
-          } else {
-            callbacks.success();
-          }
+          callbacks.success();
         },
         error: function(model, response) {
           callbacks.error()

@@ -118,3 +118,29 @@ var DoctypeCollection = FoiaCollection.extend({
   url: 'api/doctypes',
 
 });
+
+var CATRelationModel = Backbone.Model.extend({
+
+  urlRoot: 'api/catRelations',
+
+  defaults: function () {
+    return {
+      cid: 0,
+      aid: 0,
+      tid: 0,
+      username: $.cookie('username'),
+      token: $.cookie('token')
+    }
+  },
+
+  addCATRelation: function (callbacks) {
+    $.ajax({
+      url: this.urlRoot,
+      type: 'POST',
+      data: JSON.stringify(this),
+      dataType: 'json'
+    }).done(function () { callbacks.success(); })
+      .fail(function () { callbacks.error(); });
+  }
+
+});
