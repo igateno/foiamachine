@@ -18,3 +18,5 @@ to install lighttpd and enable fastCGI
 - sudo apt-get install mysql-client mysql-server
 - run migrations in ./db
 - sudo apt-get install php5-mysql
+- copy api/example.dbconnect.php into api/dbconnect.php and replace the config
+  settings as appropriate.

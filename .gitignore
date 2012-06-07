@@ -4,3 +4,4 @@ Session.vim
 .project
 .settings
 todo.txt
+api/dbconnect.php

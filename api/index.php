@@ -1,5 +1,6 @@
 <?php
   require 'Slim/Slim/Slim.php';
+  require 'dbconnect.php';
 
   //////////////////////////////////////////////////////////////////////////
   //
@@ -192,7 +193,7 @@
       $db = null;
       echo json_encode($entities);
     } catch (PDOException $e) {
-      header('HTTP/1.0 400 Bad Request', true, 400);
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
@@ -547,23 +548,6 @@
 
   //////////////////////////////////////////////////////////////////////////
   //
-  // DB Connection
-  //
-  /////////////////////////////////////////////////////////////////////////
-
-  function getConnection(){
-     $dbhost = "mysql.foiamachine.org";
-     $dbuser = "foia";
-     $dbpassphrase = "foiamachine";
-     $dbname = "foiastagingdb";
-     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser,
-          $dbpassphrase);
-     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-     return $dbh;
-  }
-
-  //////////////////////////////////////////////////////////////////////////
-  //
   // Mail Request
   //
   /////////////////////////////////////////////////////////////////////////
@@ -572,4 +556,3 @@
       $message = wordwrap($message, 70);
       mail($to, $subject, $message);
   }
-?>
