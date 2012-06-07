@@ -204,13 +204,13 @@ var RequestView = FOIAView.extend({
     _.each(prev.agencies, function (element, index, list) {
       var tab_template = _.template(this.partials.tabs);
       $('#request-preview ul').append(tab_template({
-        div_id: index,
+        div_id: 'prev'+index,
         agency: element
       }));
 
       var div_template = _.template(tpl.get('letters/us'));
       $('#request-preview .tab-content').append(div_template({
-        div_id: index,
+        div_id: 'prev'+index,
         agency_name: element,
         docs: prev.doctypes,
         question: prev.question
@@ -253,6 +253,6 @@ var RequestView = FOIAView.extend({
         self.alert(false, "Well, that wasn't supposed to happen...");
       }
     });
-  }
+  },
 
 });
