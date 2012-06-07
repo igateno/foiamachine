@@ -552,10 +552,10 @@
   /////////////////////////////////////////////////////////////////////////
 
   function getConnection(){
-     $dbhost = "localhost";
+     $dbhost = "mysql.foiamachine.org";
      $dbuser = "foia";
      $dbpassphrase = "foiamachine";
-     $dbname = "foia";
+     $dbname = "foiastagingdb";
      $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname", $dbuser,
           $dbpassphrase);
      $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -572,5 +572,4 @@
       $message = wordwrap($message, 70);
       mail($to, $subject, $message);
   }
-
 ?>
