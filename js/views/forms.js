@@ -1,3 +1,40 @@
+var EntityTableView = FOIAView.extend({
+
+  initialize: function() {
+    this.template = _.template($('#etable-template').html());
+  },
+
+  partials: {
+    row: '<tr><td><%= id %></td><td><%= name %></td></tr>'
+  },
+
+  render: function() {
+    $(this.el).html(this.template());
+
+    if (!this.model) {
+      this.alert(false, 'Error displaying the page.');
+    }
+
+    var self = this;
+    this.model.fetch({
+      success: function(model, response) {
+        _.each(response, function (element, index, list) {
+          var template = _.template(this.partials.row);
+          this.$('tbody').append(template({
+            id: index,
+            name: element.name
+          }));
+        }, self);
+      },
+      error: function() {
+        this.alert(false, 'Error displaying the page.');
+      }
+    });
+
+    return this;
+  }
+});
+
 var EntityFormView = FOIAView.extend({
 
   initialize: function() {
@@ -217,6 +254,8 @@ var FormsView = Backbone.View.extend({
   },
 
   populate: function() {
+
+    // These populate forms for new entities
     if (!this.countryFormView) {
       var country = new Entity({type: 1});
       this.countryFormView = new EntityFormView({model:country});
@@ -236,12 +275,31 @@ var FormsView = Backbone.View.extend({
       var relation = new Relation({type: 1});
       this.ccFormView = new CCFormView({model: relation});
     }
+
+    // These populate forms for new relations
     $('#new-cc-relation').append(this.ccFormView.render().el);
     if (!this.catFormView) {
       var catRelation = new CATRelationModel();
       this.catFormView = new CATFormView({model:catRelation});
     }
     $('#new-cat-relation').append(this.catFormView.render().el);
+
+    // These populate the database lookup tables
+    if (!this.countryTableView) {
+      var countries = new CountryCollection();
+      this.countryTableView = new EntityTableView({model: countries});
+    }
+    $('#entities .country-table').html(this.countryTableView.render().el);
+    if (!this.agencyTableView) {
+      var agencies = new AgencyCollection();
+      this.agencyTableView = new EntityTableView({model: agencies});
+    }
+    $('#entities .agency-table').html(this.agencyTableView.render().el);
+    if (!this.topicTableView) {
+      var topics = new TopicCollection();
+      this.topicTableView = new EntityTableView({model: topics});
+    }
+    $('#entities .topic-table').html(this.topicTableView.render().el);
   },
 
 });

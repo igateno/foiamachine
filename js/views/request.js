@@ -242,7 +242,6 @@ var RequestView = FOIAView.extend({
           success: function() {
             self.generate_previews(self.model.get('previews'));
             $('#request-preview .nav-tabs a:first').tab('show');
-            $('#request-preview .tab-pane:first').addClass('active');
           },
           error: function() {
             self.alert(false,
