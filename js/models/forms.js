@@ -133,6 +133,7 @@ var CATRelationModel = Backbone.Model.extend({
     }
   },
 
+  // TODO this can be done backbone's save
   addCATRelation: function (callbacks) {
     $.ajax({
       url: this.urlRoot,
@@ -142,5 +143,13 @@ var CATRelationModel = Backbone.Model.extend({
     }).done(function () { callbacks.success(); })
       .fail(function () { callbacks.error(); });
   }
+
+});
+
+var CATCollection = Backbone.Collection.extend({
+
+  url: 'api/catRelations',
+
+  model: CATRelationModel
 
 });

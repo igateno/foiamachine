@@ -27,6 +27,7 @@
   // Relations
   $app->get('/relations', 'getRelations');
   $app->post('/relations', 'addRelation');
+  $app->get('/catRelations', 'getCATRelations');
   $app->post('/catRelations', 'addCATRelation');
 
   // Entities and Relations tables
@@ -283,6 +284,20 @@
       $stmt->execute();
       $db = null;
       echo '{"status":"ok"}';
+    }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  function getCATRelations() {
+    $sql = file_get_contents('../db/queries/catrelations.sql');
+    try{
+      $db = getConnection();
+      $stmt = $db->query($sql);
+      $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
+      $db = null;
+      echo json_encode($relations);
     }catch(PDOException $e){
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';

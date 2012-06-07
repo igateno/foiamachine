@@ -1,3 +1,37 @@
+var CATTableView = FOIAView.extend({
+
+  el: $('#relations .cat'),
+
+  partials: {
+    row: '<tr><td><%= country %></td><td><%= agency %></td><td><%= topic %></td></tr>'
+  },
+
+  render: function() {
+    if (!this.model) {
+      this.alert(false, 'Error displaying the page.');
+    }
+
+    var self = this;
+    this.model.fetch({
+      success: function (model, response) {
+        console.log(this.el);
+        _.each(response, function(element, index, list) {
+          var template = _.template(this.partials.row);
+          $('#relations .cat tbody').append(template({
+            country: element.country,
+            agency: element.agency,
+            topic: element.topic
+          }));
+        }, self);
+      },
+      error: function() {
+        this.alert(false, 'Error displaying the page.');
+      }
+    });
+  }
+
+});
+
 var EntityTableView = FOIAView.extend({
 
   initialize: function() {
@@ -21,7 +55,7 @@ var EntityTableView = FOIAView.extend({
         _.each(response, function (element, index, list) {
           var template = _.template(this.partials.row);
           this.$('tbody').append(template({
-            id: index,
+            id: element.id,
             name: element.name
           }));
         }, self);
@@ -284,7 +318,7 @@ var FormsView = Backbone.View.extend({
     }
     $('#new-cat-relation').append(this.catFormView.render().el);
 
-    // These populate the database lookup tables
+    // These populate the database lookup tables for entities
     if (!this.countryTableView) {
       var countries = new CountryCollection();
       this.countryTableView = new EntityTableView({model: countries});
@@ -300,6 +334,13 @@ var FormsView = Backbone.View.extend({
       this.topicTableView = new EntityTableView({model: topics});
     }
     $('#entities .topic-table').html(this.topicTableView.render().el);
+
+    // These populate the database lookup tables for relations
+    if (!this.catTableView) {
+      var catCollection = new CATCollection();
+      this.catTableView = new CATTableView({model: catCollection});
+    }
+    this.catTableView.render();
   },
 
 });
