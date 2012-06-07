@@ -13,13 +13,9 @@ var Session = Backbone.Model.extend({
   },
 
   setCookie: function (response, callbacks) {
-    if (response.token.length > 0) {
-      $.cookie('username', this.get('username'));
-      $.cookie('token', response.token);
-      callbacks.good();
-    } else {
-      callbacks.bad(response.error);
-    }
+    $.cookie('username', this.get('username'));
+    $.cookie('token', response.token);
+    callbacks.good();
   },
 
   login: function(callbacks) {
@@ -31,8 +27,9 @@ var Session = Backbone.Model.extend({
         self.setCookie(response, callbacks);
       },
       error: function(model, response) {
-        // TODO for actual error
         self.set('password', '');
+        console.log(response);
+        callbacks.bad(response.error);
       }
     });
   },

@@ -32,13 +32,14 @@ var LoginView = FOIAView.extend({
       username: $('#login .username input').val(),
       password: $('#login .password input').val()
     });
+
     var self = this;
     this.model.login({
       good: function() {
         app.navigate('dash', {trigger: true});
       },
       bad: function(errstr) {
-        self.alert(false, errstr);
+        self.alert(false, 'Invalid username or password');
       }
     });
   },
