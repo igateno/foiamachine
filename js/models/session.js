@@ -12,10 +12,10 @@ var Session = Backbone.Model.extend({
     password: '',
   },
 
-  setCookie: function (response, callbacks) {
+  setCookie: function (token, callback) {
     $.cookie('username', this.get('username'));
-    $.cookie('token', response.token);
-    callbacks.good();
+    $.cookie('token', token);
+    callback();
   },
 
   login: function(callbacks) {
@@ -24,12 +24,11 @@ var Session = Backbone.Model.extend({
     this.save(null, {
       success: function(model, response) {
         self.set('password', '');
-        self.setCookie(response, callbacks);
+        self.setCookie(response.token, callbacks.success);
       },
       error: function(model, response) {
         self.set('password', '');
-        console.log(response);
-        callbacks.bad(response.error);
+        callbacks.error(jQuery.parseJSON(response.responseText).error);
       }
     });
   },
@@ -40,13 +39,13 @@ var Session = Backbone.Model.extend({
     this.save(null, {
       success: function(model, response) {
         self.set('password', '');
-        self.setCookie(response, callbacks);
+        self.setCookie(response.token, callbacks.success);
       },
       error: function(model, response) {
-        // TODO
         self.set('password', '');
+        callbacks.error(jQuery.parseJSON(response.responseText).error);
       }
     });
-  }
+  },
 
 });

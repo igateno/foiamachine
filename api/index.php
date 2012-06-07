@@ -153,8 +153,7 @@
       $stmt->bindParam("hash", $hash);
       $stmt->bindParam("salt", $salt);
       $stmt->execute();
-      $auth = $stmt->fetchObject();
-      $id = $db->last_insert_id();
+      $id = $db->lastInsertId();
       $db = null;
       echoToken($id, $salt);
     } catch (PDOException $e) {

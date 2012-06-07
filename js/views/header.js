@@ -7,7 +7,8 @@ var HeaderView = Backbone.View.extend({
   events: {
     'click .navbar a.dash':'dash',
     'click .navbar a.request':'request',
-    'click .navbar a.forms':'forms'
+    'click .navbar a.forms':'forms',
+    'click .navbar a.logout':'logout'
   },
 
   render: function() {
@@ -25,6 +26,12 @@ var HeaderView = Backbone.View.extend({
 
   forms: function() {
     app.navigate('forms', {trigger: true});
+  },
+
+  logout: function() {
+    $.cookie('username', null);
+    $.cookie('token', null);
+    app.navigate('login', {trigger: true});
   }
 
 });

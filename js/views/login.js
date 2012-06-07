@@ -35,10 +35,10 @@ var LoginView = FOIAView.extend({
 
     var self = this;
     this.model.login({
-      good: function() {
+      success: function() {
         app.navigate('dash', {trigger: true});
       },
-      bad: function(errstr) {
+      error: function(errstr) {
         self.alert(false, 'Invalid username or password');
       }
     });
@@ -81,10 +81,10 @@ var LoginView = FOIAView.extend({
       code: $('#register .code input').val()
     });
     this.model.register({
-      good: function() {
+      success: function() {
         app.navigate('dash', {trigger: true});
       },
-      bad: function(errstr) {
+      error: function(errstr) {
         self.alert(false, errstr);
       }
     });
