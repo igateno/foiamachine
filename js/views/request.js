@@ -208,7 +208,8 @@ var RequestView = FOIAView.extend({
         agency: element.agency_name
       }));
 
-      var div_template = _.template(tpl.get('letters/' + element.template));
+      var tplname = element.template || 'us';
+      var div_template = _.template(tpl.get('letters/' + tplname));
       $('#request-preview .tab-content').append(div_template({
         div_id: 'prev'+index,
         agency_name: element.agency_name,

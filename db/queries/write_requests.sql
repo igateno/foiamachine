@@ -1,3 +1,7 @@
+/*
+ * This query requires that all agencies have an entry in the agency_data
+ * table, otherwise they will not show up in the results.
+ */
 select
   l1.id,
   l1.question,
