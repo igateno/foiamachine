@@ -85,6 +85,7 @@ var templates = [
   'header',
   'request',
   'letters/us',
+  'letters/serbia-english',
   'agency-tab',
   'agency-div',
   'agency-checkbox',

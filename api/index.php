@@ -435,8 +435,13 @@
           $previews['start_date'] = $result->start_date;
         if (!array_key_exists('end_date', $previews))
           $previews['end_date'] = $result->end_date;
-        if (!array_key_exists($result->agency_id, $previews['agencies']))
-          $previews['agencies'][$result->agency_id] = $result->agency_name;
+        if (!array_key_exists('created', $previews))
+          $previews['created'] = $result->created;
+        if (!array_key_exists($result->agency_id, $previews['agencies'])) {
+          $previews['agencies'][$result->agency_id]['agency_name'] = $result->agency_name;
+          $previews['agencies'][$result->agency_id]['contact_name'] = $result->contact_name;
+          $previews['agencies'][$result->agency_id]['template'] = $result->template;
+        }
         if (!array_key_exists($result->doctype_id, $previews['doctypes']))
           $previews['doctypes'][$result->doctype_id] = $result->doctype_name;
       }

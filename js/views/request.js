@@ -205,17 +205,19 @@ var RequestView = FOIAView.extend({
       var tab_template = _.template(this.partials.tabs);
       $('#request-preview ul').append(tab_template({
         div_id: 'prev'+index,
-        agency: element
+        agency: element.agency_name
       }));
 
-      var div_template = _.template(tpl.get('letters/us'));
+      var div_template = _.template(tpl.get('letters/' + element.template));
       $('#request-preview .tab-content').append(div_template({
         div_id: 'prev'+index,
-        agency_name: element,
+        agency_name: element.agency_name,
+        contact_name: element.contact_name,
         docs: prev.doctypes,
         question: prev.question,
         start_date: prev.start_date,
-        end_date: prev.end_date
+        end_date: prev.end_date,
+        created: prev.created
       }));
     }, this);
   },
