@@ -213,7 +213,9 @@ var RequestView = FOIAView.extend({
         div_id: 'prev'+index,
         agency_name: element,
         docs: prev.doctypes,
-        question: prev.question
+        question: prev.question,
+        start_date: prev.start_date,
+        end_date: prev.end_date
       }));
     }, this);
   },

@@ -9,6 +9,9 @@
     <% _.each(docs, function (element, index, list) {  %>
       <%= element %>,
     <% }); %>
+    <% if (start_date && end_date) { %>
+      produced between <%= start_date %> and <%= end_date %>,
+    <% } %>
     containing the following information be delivered to me:
   </p>
   <p><%= question %></p>

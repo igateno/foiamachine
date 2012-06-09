@@ -1,6 +1,8 @@
 select
   l1.id,
   l1.question,
+  date_format(l1.start_date, '%M %D, %Y') as start_date,
+  date_format(l1.end_date, '%M %D, %Y') as end_date,
   e1.id as agency_id,
   e1.name as agency_name,
   e2.id as doctype_id,

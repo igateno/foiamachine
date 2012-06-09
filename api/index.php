@@ -431,6 +431,10 @@
       foreach ($results as $result) {
         if (!array_key_exists('question', $previews))
           $previews['question'] = $result->question;
+        if (!array_key_exists('start_date', $previews))
+          $previews['start_date'] = $result->start_date;
+        if (!array_key_exists('end_date', $previews))
+          $previews['end_date'] = $result->end_date;
         if (!array_key_exists($result->agency_id, $previews['agencies']))
           $previews['agencies'][$result->agency_id] = $result->agency_name;
         if (!array_key_exists($result->doctype_id, $previews['doctypes']))
