@@ -245,6 +245,10 @@ var RequestView = FOIAView.extend({
     });
     session.register({
       success: function() {
+        self.model.set({
+          username: $.cookie('username'),
+          token: $.cookie('token')
+        });
         self.save_request(function() {
           self.preview_request();
         });
