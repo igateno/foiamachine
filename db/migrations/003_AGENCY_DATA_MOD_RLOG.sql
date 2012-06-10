@@ -1,6 +1,6 @@
 alter table `request_log`
   add `approved` bool default 0 after `question`,
-  add `sent` bool default 0 after `approved`;
+  add `sent` timestamp default null after `approved`;
 
 /* this table will have to be modified to include timeline details */
 create table `agency_data` (
