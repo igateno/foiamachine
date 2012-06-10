@@ -32,6 +32,7 @@ var HeaderView = Backbone.View.extend({
   logout: function() {
     $.cookie('username', null);
     $.cookie('token', null);
+    this.render();
     app.navigate('login', {trigger: true});
   }
 

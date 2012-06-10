@@ -5,7 +5,7 @@ var LoginView = FOIAView.extend({
   },
 
   events: {
-    'click #login a.login': 'login',
+    'click #login button': 'login',
     'keypress #login input': 'loginEnter',
     'click #register a.register': 'register',
     'keypress #register input': 'registerEnter'
@@ -36,6 +36,8 @@ var LoginView = FOIAView.extend({
     var self = this;
     this.model.login({
       success: function() {
+        $('#signin-modal').modal('hide');
+        app.headerView.render();
         app.navigate('dash', {trigger: true});
       },
       error: function(errstr) {

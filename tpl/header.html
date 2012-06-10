@@ -6,7 +6,7 @@
         <% if (authed) { %>
           <%= '<li><a class="logout">Logout</a></li>' %>
         <% } else { %>
-          <%= '<li><a class="signin">Sign In</a></li>' %>
+          <%= '<li><a data-target="#signin-modal" data-toggle="modal">Sign In</a></li>' %>
         <% } %>
       </ul>
     </div>
