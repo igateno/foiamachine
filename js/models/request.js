@@ -91,42 +91,11 @@ var Request = Backbone.Model.extend({
     });
   },
 
-  setAgencies: function(checkboxes, callbacks) {
-    this.set('agencies', new RequestAgencyCollection())
+  setCheckboxes: function(checkboxes, key) {
+    this.set(key, []);
     _.each(checkboxes, function(element, index, list) {
-      this.get('agencies').create(
-      {
-        request_log_id: this.id,
-        agency_id: element.id
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      });
+      this.get(key).push(element.id);
     }, this);
   },
 
-  setDoctypes: function(buttons, callbacks) {
-    this.set('doctypes', new RequestDoctypeCollection())
-    _.each(buttons, function(element, index, list) {
-      this.get('doctypes').create(
-      {
-        request_log_id: this.id,
-        doctype_id: $(element).attr('id')
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      }
-      );
-    }, this);
-  }
 });

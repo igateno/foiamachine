@@ -2,3 +2,52 @@ body {
   margin-top: 60px;
   padding-bottom: 40px;
 }
+
+body .hero-unit {
+  text-align: center;
+}
+
+body .hero-unit form {
+  margin: 80px;
+}
+
+body .hero-unit input.big {
+  font-size: 36px;
+  height: 40px;
+  width: 768px;
+  line-height: 40px;
+  padding: 2px;
+}
+
+body .hero-unit input.gobtn {
+  height: 40px;
+  width: 40px;
+}
+
+body #new-request h1 {
+  font-size: 60px;
+}
+
+body .carousel {
+  text-align: center;
+  margin: 10px 240px;
+}
+
+body .carousel h1 {
+  margin-bottom: 25px;
+}
+
+body .carousel h2 {
+  margin-bottom: 15px;
+}
+
+body .carousel ul {
+  list-style-type: none;
+  font-size: 18px;
+}
+
+body #question textarea {
+  width: 500px;
+  height: 250px;
+  font-size: 16px;
+}
