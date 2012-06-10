@@ -47,12 +47,6 @@ var RequestView = FOIAView.extend({
     $(this).tab('show');
   },
 
-  append_next: function(e, selector) {
-    $(e.target).detach();
-    var template = _.template($(selector).html());
-    $('#new-request form fieldset').append(template);
-  },
-
   build_tabs: function(element, index, list) {
     var tabTemplate = _.template(tpl.get('agency-tab'));
     $('#agency-tabs ul').append(tabTemplate({
