@@ -1,0 +1,193 @@
+<div id="new-request" class="span12">
+    <div id="request-carousel" class="carousel slide">
+      <h1>New Request</h1>
+      <div class="carousel-inner">
+        <div class="active item">
+          <h2>
+            You want to learn about <%= country_name %>.
+          </h2>
+          <p>
+            You can make many requests on topics ranging from "Debt Crisis"
+            or "Immigration" to "Pet licenses" or "Road Cleaning". What is
+            the topic of your request?
+          </p>
+          <div id="topic">
+            <input class="topic"
+                   type="text"
+                   data-provide="typeahead">
+            <input id="topicBtn" type="submit" value="Next">
+          </div> <!-- topic -->
+        </div>
+        <div id="suggestions" class="item">
+        </div>
+        <div id="question" class="item">
+        </div>
+        <div id="date" class="item">
+        </div>
+        <div id="doctypes" class="item">
+        </div>
+        <div id="request-preview" class="item">
+        </div>
+      </div> <!-- carousel-inner -->
+    </div> <!-- request-carousel -->
+</div> <!-- span6 -->
+
+<div class="modal hide" id="register-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">x</button>
+    <h1>Register</h1>
+  </div> <!-- modal-header -->
+  <div id="register">
+    <div class="modal-body">
+      <p>
+        Since these are official, legally binding requests, we have to know who
+        you are before we can send them on your behalf. After you've registered
+        you can preview your requests before you send them.
+      </p>
+      <form>
+          <fieldset>
+            <div class="username">
+              <label for="username">Username:</label>
+              <input name="username" type="text" required autofocus>
+            </div> <!-- username -->
+            <div class="email">
+              <label for="email">Email:</label>
+              <input name="email" type="email" required>
+            </div> <!-- email -->
+            <div class="password1">
+              <label for="password1">Password:</label>
+              <input name="password1" type="password" required>
+            </div> <!-- password1 -->
+            <div class="password2">
+              <label for="password2">Again, please:</label>
+              <input name="password2" type="password" required>
+            </div> <!-- password2 -->
+            <div class="code">
+              <label for="code">Access code:</label>
+              <input name="code" type="password" required>
+            </div> <!-- code -->
+          </fieldset>
+        </form>
+    </div> <!-- modal-body -->
+    <div class="modal-footer">
+      <button class="btn">Register</button>
+    </div> <!-- modal-footer -->
+  </div>
+</div>
+
+<!-- agency tabs -->
+<script id="agency-template" type="text/template">
+  <h2>Where should we direct your question?</h2>
+  <p>
+    Based on your choices so far, here are some
+    possible sources of reliable information in different countries.
+    Choose the ones you like.
+  </p>
+  <div class="row-fluid">
+    <div id="agency-tabs" class="span4">
+      <ul class="nav nav-tabs nav-stacked">
+        <!-- country names here -->
+      </ul>
+    </div> <!-- request-countries -->
+
+    <div id="agencies" class="span8 tab-content">
+      <!-- agency names here -->
+    </div> <!-- agencies -->
+
+  </div> <!-- row-fluid -->
+
+  <div>
+    <input id="agencyBtn" type="submit" value="Next">
+  </div>
+</script>
+
+<script id="question-template" type="text/template">
+  <div id="question">
+    <p>
+      It's time to tell us what your important question is. This is the part
+      of the request that actually tells us (and the government) what
+      information you want. Keep in mind that very broad questions are less
+      likely to result in useful information.
+    <p>
+    <textarea></textarea>
+    <div><input id="qBtn" type="submit" value="Next"></div>
+  </div>
+</script>
+
+<script id="date-template" type="text/template">
+  <div id="date" class="row-fluid">
+    <h2>We're almost there</h2>
+    <p>
+      You're request will be easier to fullfil, and thus more likely to
+      produce results, if you choose to narrow the range of dates that you
+      are concerned about. If you only want to know about the first Gulf War,
+      why get documents about expenditures in Iraq in 2012?
+    </p>
+    <div>
+      Start Date:
+      <span class="date-container start"></span>
+    </div>
+    <div>
+      End Date:
+      <span class="date-container end"></span>
+    </div>
+    <input id="dateNext" type="submit" value="Next">
+    <input id="dateSkip" type="submit" value="Skip">
+  </div> <!-- date -->
+</script>
+
+<script id="doctypes-template" type="text/template">
+  <h2>One last thing...</h2>
+  <p>
+    Unless you're very specific about which types of documents are included
+    within the scope of your request, agencies are not legally obliageted to
+    delived anything and everything. If there is something specific that you
+    want, this is the place to ask for it.
+  </p>
+  <ul>
+  </ul>
+  <input id="docsNext" type="submit" value="Next">
+</script>
+
+<script id="datepicker-template" type="text/template">
+  <select class="month">
+    <option value="" selected>Month</option>
+    <option value="01">Jan</option>
+    <option value="02">Feb</option>
+    <option value="03">Mar</option>
+    <option value="04">Apr</option>
+    <option value="05">May</option>
+    <option value="06">Jun</option>
+    <option value="07">Jul</option>
+    <option value="08">Aug</option>
+    <option value="09">Sep</option>
+    <option value="10">Oct</option>
+    <option value="11">Nov</option>
+    <option value="12">Dec</option>
+  </select>
+  <select class="day">
+    <option value="" selected>Day</option>
+    <% for (var i = 1; i <= 31; i++) { %>
+      <option value="<%= i %>"><%= i %></option>
+    <% } %>
+  </select>
+  <select class="year">
+    <option value="" selected>Year</option>
+    <% for (var i = 2012; i >= 1900; i--) { %>
+      <option value="<%= i %>"><%= i %></option>
+    <% } %>
+  </select>
+</script>
+
+<script id="preview-template" type="text/template">
+  <h2>And just to double check</h2>
+  <p>
+    Here is the full text of your requests to you can read them over before
+    hitting the big ol' "Send" button.
+  </p>
+  <ul id="preview-tabs" class="nav nav-tabs">
+  </ul> <!-- nav-tabs -->
+
+  <div id="previews" class="tab-content">
+  </div> <!-- tab-content -->
+</script>

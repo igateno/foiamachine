@@ -249,6 +249,7 @@ var RequestView = FOIAView.extend({
           username: $.cookie('username'),
           token: $.cookie('token')
         });
+        $('#register-modal').modal('hide');
         self.save_request(function() {
           self.preview_request();
         });
@@ -301,8 +302,11 @@ var RequestView = FOIAView.extend({
 
     this.model.fetchPreviews({
       success: function() {
+        var template = _.template($('#preview-template').html());
+        $('#request-preview').html(template());
         self.generate_previews(self.model.get('previews'));
         $('#request-preview .nav-tabs a:first').tab('show');
+        $('#request-carousel').carousel('next');
       },
       error: function() {
         self.alert(false,
