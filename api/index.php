@@ -36,10 +36,6 @@
 
   // Request Log
   $app->post('/requestLog', 'addRequestLog');
-  $app->put('/requestLog', 'updateRequestLog');
-
-  $app->post('/requestAgencies', 'addRequestAgencies');
-  $app->post('/requestDoctypes', 'addRequestDoctypes');
 
   $app->run();
 
@@ -495,102 +491,46 @@
     $request = Slim::getInstance()->request();
     $params = json_decode($request->getBody());
 
-    $sql = 'insert into request_log (user_id, country_id, topic_id)'.
-           'values (:user_id, :country_id, :topic_id)';
+    $sql1 = 'insert into request_log'.
+           '(user_id, country_id, topic_id, start_date, end_date, question)'.
+           'values'.
+           '(:user_id, :country_id, :topic_id, :start_date, :end_date, :question)';
+    $sql2 = 'insert into request_log_agencies (request_log_id, agency_id)'.
+           'values (:request_log_id, :agency_id)';
+    $sql3 = 'insert into request_log_doctypes (request_log_id, doctype_id)'.
+           'values (:request_log_id, :doctype_id)';
+
+    $db = getConnection();
+    $db->beginTransaction();
     try{
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
+      $stmt = $db->prepare($sql1);
       $stmt->bindParam('user_id', $id);
       $stmt->bindParam('country_id', $params->country);
       $stmt->bindParam('topic_id', $params->topic);
-      $stmt->execute();
-      $params->id = $db->lastInsertId();
-      $db = null;
-      echo json_encode($params);
-    }catch(PDOException $e){
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
-  }
-
-  function updateRequestLog() {
-    $id = validateToken();
-    if (!$id) {
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error": "invalid token"}';
-      return;
-    }
-
-    $request = Slim::getInstance()->request();
-    $params = json_decode($request->getBody());
-
-    $sql = 'update request_log set '.
-           'start_date = :start_date, '.
-           'end_date = :end_date, '.
-           'question = :question '.
-           'where id = :id';
-
-    try {
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam('id', $params->id);
       $stmt->bindParam('start_date', $params->start);
       $stmt->bindParam('end_date', $params->end);
       $stmt->bindParam('question', $params->question);
       $stmt->execute();
-    } catch (PDOException $e) {
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
-  }
+      $params->id = $db->lastInsertId();
 
-  function addRequestAgencies() {
-    $id = validateToken();
-    if (!$id) {
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error": "invalid token"}';
-      return;
-    }
+      foreach($params->agency_ids as $aid) {
+        $stmt = $db->prepare($sql2);
+        $stmt->bindParam('request_log_id', $params->id);
+        $stmt->bindParam('agency_id', $aid);
+        $stmt->execute();
+      }
 
-    $request = Slim::getInstance()->request();
-    $params = json_decode($request->getBody());
+      foreach($params->doctype_ids as $did) {
+        $stmt = $db->prepare($sql3);
+        $stmt->bindParam('request_log_id', $params->id);
+        $stmt->bindParam('doctype_id', $did);
+        $stmt->execute();
+      }
 
-    $sql = 'insert into request_log_agencies (request_log_id, agency_id)'.
-           'values (:request_log_id, :agency_id)';
-    try{
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam('request_log_id', $params->request_log_id);
-      $stmt->bindParam('agency_id', $params->agency_id);
-      $stmt->execute();
-      $db = null;
+      $db->commit();
+      echo json_encode($params);
     }catch(PDOException $e){
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
-  }
-
-  function addRequestDoctypes() {
-    $id = validateToken();
-    if (!$id) {
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error": "invalid token"}';
-      return;
-    }
-
-    $request = Slim::getInstance()->request();
-    $params = json_decode($request->getBody());
-
-    $sql = 'insert into request_log_doctypes (request_log_id, doctype_id)'.
-           'values (:request_log_id, :doctype_id)';
-    try{
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam('request_log_id', $params->request_log_id);
-      $stmt->bindParam('doctype_id', $params->doctype_id);
-      $stmt->execute();
-      $db = null;
-    }catch(PDOException $e){
+      $db->rollback();
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }

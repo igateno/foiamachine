@@ -12,7 +12,7 @@ var RequestView = FOIAView.extend({
     'click #new-request input#dateNext': 'save_date',
     'click #new-request input#dateSkip': 'skip_date',
     'click #new-request input#docsNext': 'save_docs',
-    'click #new-request input#docsSkip': 'skip_docs'
+    'click #register button': 'register'
   },
 
   partials: {
@@ -190,20 +190,83 @@ var RequestView = FOIAView.extend({
 
   save_docs: function(e) {
     e.preventDefault();
-    this.model.setCheckboxes($('.btn-group button.active'), 'doctype_ids');
-    this.load_registration();
+    var checked = $('#doctypes ul :checkbox:checked');
+
+    if (checked.length == 0) {
+      this.alert(false, 'Please choose at least one document type');
+      return;
+    }
+
+    this.model.setCheckboxes(checked, 'doctype_ids');
+
+    var self = this;
+    if ($.cookie('token')) {
+      this.save_request(function() {
+        self.preview_request();
+      });
+    } else {
+      $('#register-modal').modal('show');
+    }
   },
 
-  skip_docs: function(e) {
+  register: function(e) {
     e.preventDefault();
-    this.load_registration();
+
+    if ($('#register .username input').val().length == 0) {
+      this.alert(false, 'Username cannot be blank.');
+      return;
+    }
+    if ($('#register .email input').val().length == 0) {
+      this.alert(false, 'Email cannot be blank.');
+      return;
+    }
+    if ($('#register .password1 input').val().length < 8) {
+      this.alert(false, 'Passwords must be at least 8 characters.');
+      return;
+    }
+    if ($('#register .password1 input').val() !=
+        $('#register .password2 input').val()) {
+      this.alert(false, 'The passwords do not match.');
+      return;
+    }
+    if ($('#register .code input').val().length == 0) {
+      this.alert(false, 'You must have an access code to register.');
+      return;
+    }
+
+    var session = new Session();
+    var self = this;
+
+    session.set({
+      username: $('#register .username input').val(),
+      password: $('#register .password1 input').val(),
+      email: $('#register .email input').val(),
+      code: $('#register .code input').val()
+    });
+    session.register({
+      success: function() {
+        self.save_request(function() {
+          self.preview_request();
+        });
+      },
+      error: function(errstr) {
+        self.alert(false, errstr);
+      }
+    });
   },
 
-  load_registration: function() {
-    $('#register-modal').modal('show');
-    // register the user
-    // save the model
-    // preview the request
+  save_request: function (callback) {
+    var self = this;
+    this.model.save(null, {
+      success: function (model, response) {
+        self.model.set('id', response.id);
+        callback();
+      },
+      error: function () {
+        self.alert(false, 'Something went wrong.');
+      }
+    });
+
   },
 
   generate_previews: function (prev) {
@@ -229,7 +292,7 @@ var RequestView = FOIAView.extend({
     }, this);
   },
 
-  preview_request: function(e) {
+  preview_request: function() {
     var self = this;
 
     this.model.fetchPreviews({

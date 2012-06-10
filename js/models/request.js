@@ -98,42 +98,4 @@ var Request = Backbone.Model.extend({
     }, this);
   },
 
-  saveAgencies: function(callbacks) {
-    this.set('agencies', new RequestAgencyCollection())
-    _.each(this.get('agency_ids'), function(element, index, list) {
-      this.get('agencies').create(
-      {
-        request_log_id: this.id,
-        agency_id: element
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      });
-    }, this);
-  },
-
-  saveDoctypes: function(callbacks) {
-    this.set('doctypes', new RequestDoctypeCollection())
-    _.each(this.get('doctype_ids'), function(element, index, list) {
-      this.get('doctypes').create(
-      {
-        request_log_id: this.id,
-        doctype_id: $(element).attr('id')
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      }
-      );
-    }, this);
-  }
 });
