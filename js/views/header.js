@@ -12,7 +12,8 @@ var HeaderView = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).html(this.template());
+    var authed = $.cookie('token') ? true : false;
+    $(this.el).html(this.template({authed: authed}));
     return this;
   },
 
