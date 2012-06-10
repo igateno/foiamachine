@@ -21,6 +21,7 @@
 
   $app->get('/countries', 'getCountries');
   $app->get('/agencies', 'getAgencies');
+  $app->post('/agencies', 'addAgency');
   $app->get('/topics', 'getTopics');
   $app->get('/doctypes', 'getDoctypes');
 
@@ -28,7 +29,6 @@
   $app->get('/ccRelations', 'getCCRelations');
   $app->post('/ccRelations', 'addCCRelation');
   $app->get('/catRelations', 'getCATRelations');
-  $app->post('/catRelations', 'addCATRelation');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
@@ -214,6 +214,24 @@
     getEntitiesByType(4);
   }
 
+  function addEntityQuery($params) {
+    $sql = "insert into entities (name, type) values(:name, :type)";
+    try{
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam("name", $params->name);
+      $stmt->bindParam("type", $params->type);
+      $stmt->execute();
+      $id = $db->lastInsertId();
+      $db = null;
+      return $id;
+    }catch(PDOException $e){
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+      return null;
+    }
+  }
+
   function addEntity(){
     $id = validateToken();
     if (!$id) {
@@ -222,22 +240,60 @@
       return;
     }
 
-     $request = Slim::getInstance()->request();
-     $entity = json_decode($request->getBody());
-    $sql = "insert into entities (name, type) values(:name, :type)";
-     try{
-        $db = getConnection();
-        $stmt = $db->prepare($sql);
-        $stmt->bindParam("name", $entity->name);
-        $stmt->bindParam("type", $entity->type);
-        $stmt->execute();
-        $entity->id = $db->lastInsertId();
-        $db = null;
-        echo json_encode($entity);
-     }catch(PDOException $e){
-        header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-        echo '{"error":{"text":'.$e->getMessage().'}}';
-     }
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $params->id = addEntityQuery($params);
+
+    if ($params->id) {
+      echo json_encode($params);
+    }
+  }
+
+  function addAgency() {
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql1 = 'insert into entities (name, type) values (:name, 2)';
+    $sql2 = 'insert into relations (id1, id2, type) values'.
+            '(:cid, :aid, 2), (:tid, :aid, 3)';
+    $sql3 = 'insert into agency_data (agency_id, contact_name, email) values'.
+            '(:aid, :contact, :email)';
+
+    $db = getConnection();
+    $db->beginTransaction();
+    try {
+      $stmt = $db->prepare($sql1);
+      $stmt->bindParam('name', $params->agency_name);
+      $stmt->execute();
+      $params->agency_id = $db->lastInsertId();
+
+      $stmt = $db->prepare($sql2);
+      $stmt->bindParam('cid', $params->country_id);
+      $stmt->bindParam('aid', $params->agency_id);
+      $stmt->bindParam('tid', $params->topic_id);
+      $stmt->execute();
+
+      $stmt = $db->prepare($sql3);
+      $stmt->bindParam('aid', $params->agency_id);
+      $stmt->bindParam('contact', $params->contact_name);
+      $stmt->bindParam('email', $params->email);
+      $stmt->execute();
+
+      $db->commit();
+      echo json_encode($params);
+    } catch (PDOException $e) {
+      $db->rollBack();
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////
@@ -296,34 +352,6 @@
       $relations = $stmt->fetchAll(PDO::FETCH_OBJ);
       $db = null;
       echo json_encode($relations);
-    }catch(PDOException $e){
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error":{"text":'.$e->getMessage().'}}';
-    }
-  }
-
-  function addCATRelation() {
-    $id = validateToken();
-    if (!$id) {
-      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
-      echo '{"error": "invalid token"}';
-      return;
-    }
-
-    $request = Slim::getInstance()->request();
-    $params = json_decode($request->getBody());
-
-    $sql = 'insert into relations (id1, id2, type) values'.
-           '(:cid, :aid, 2), (:tid, :aid, 3)';
-    try{
-      $db = getConnection();
-      $stmt = $db->prepare($sql);
-      $stmt->bindParam("cid", $params->cid);
-      $stmt->bindParam("aid", $params->aid);
-      $stmt->bindParam("tid", $params->tid);
-      $stmt->execute();
-      $db = null;
-      echo '{"status":"ok"}';
     }catch(PDOException $e){
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';

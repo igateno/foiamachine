@@ -96,6 +96,25 @@ var CountryCollection = FoiaCollection.extend({
 
 });
 
+var Agency = Backbone.Model.extend({
+
+  urlRoot: 'api/agencies',
+
+  defaults: function() {
+    return {
+      agency_name: '',
+      type: 2, // this is the entity type
+      country_id: 0,
+      topic_id: 0,
+      contact_name: '',
+      email: '',
+      username: $.cookie('username'),
+      token: $.cookie('token')
+    }
+  }
+
+});
+
 var AgencyCollection = FoiaCollection.extend({
 
   model: Entity.extend({type:2}),
@@ -133,17 +152,6 @@ var CATRelationModel = Backbone.Model.extend({
       token: $.cookie('token')
     }
   },
-
-  // TODO this can be done backbone's save
-  addCATRelation: function (callbacks) {
-    $.ajax({
-      url: this.urlRoot,
-      type: 'POST',
-      data: JSON.stringify(this),
-      dataType: 'json'
-    }).done(function () { callbacks.success(); })
-      .fail(function () { callbacks.error(); });
-  }
 
 });
 

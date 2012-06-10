@@ -98,50 +98,171 @@ var EntityTableView = FOIAView.extend({
   }
 });
 
-var EntityFormView = FOIAView.extend({
+var AgencyFormView = FOIAView.extend({
 
   initialize: function() {
-    this.template = _.template($('#new-entity-template').html());
+    this.template = _.template($('#new-agency-template').html());
   },
 
   events: {
-    'click a.add-entity': 'addEntity',
-    'keypress input.name': 'countryEnter'
+    'click a.add-agency': 'addAgency',
+    'keypress input.name': 'agencyEnter'
   },
 
   render: function() {
     $(this.el).html(this.template());
+
+    var self = this;
+
+    this.agencies = new AgencyCollection();
+    this.agencies.fetch({
+      success: function(model, response) {
+        this.$('input.name').typeahead({
+          source: model.nameArray()
+        });
+      },
+      error: function() {
+        self.alert('false', 'Error populating agencies.');
+      }
+    });
+
+    this.countries = new CountryCollection();
+    this.countries.fetch({
+      success: function(model, response) {
+        this.$('input.country').typeahead({
+          source: model.nameArray()
+        });
+      },
+      error: function() {
+        self.alert('false', 'Error populating countries.');
+      }
+    });
+
+    this.topics = new TopicCollection();
+    this.topics.fetch({
+      success: function(model, response) {
+        this.$('input.topic').typeahead({
+          source: model.nameArray()
+        });
+      },
+      error: function() {
+        self.alert('false', 'Error populating topics.');
+      }
+    });
+
     return this;
   },
 
-  // TODO when a new entity is added, it should also be added to the
-  // typeaheads for the relation forms so that the page doesn't have
-  // to reload
-  addEntity: function(e) {
-    e.preventDefault();
+  verifyAndExtractInput: function () {
+    var results = {};
 
-    if (this.$('input.name').val().length == 0)
+    if (this.$('input.name').val().length == 0) {
+      this.alert(false, 'Agency name is a required field.');
+      return null;
+    }
+    results.agency = this.$('input.name').val();
+    if (this.agencies.idForName(results.agency)) {
+      this.alert(false, 'This agency already exists in the database.');
       return;
+    }
+    if (this.$('input.country').val().length == 0) {
+      this.alert(false, 'Agency country is a required field.');
+      return null;
+    }
+    results.country = this.$('input.country').val();
+    if (this.$('input.topic').val().length == 0) {
+      this.alert(false, 'Agency topic is a required field.');
+      return null;
+    }
+    results.topic = this.$('input.topic').val();
+    if (this.$('input.contact').val().length == 0) {
+      this.alert(false, 'Agency contact is a required field.');
+      return null;
+    }
+    results.contact = this.$('input.contact').val();
+    if (this.$('input.email').val().length == 0) {
+      this.alert(false, 'Agency email is a required field.');
+      return null;
+    }
+    results.email = this.$('input.email').val();
 
-    var self = this;
-    this.model.set({
-      name: this.$('input.name').val(),
-    });
-    this.prevType = this.model.get('type');
-    this.model.save(null, {
-      success: function(model, response) {
-        self.model = new Entity({type:self.prevType});
-        self.render();
-        self.alert(true, 'Successfully added entity.');
-      },
-      error: function(model, response) {
-        self.alert(false, 'Error adding entity.');
-      }
-    });
+    return results;
   },
 
-  countryEnter: function(e) {
-    if (e.keyCode == 13) this.addEntity(e);
+  // TODO when a new agency is added, it should also be added to the
+  // typeaheads for the relation forms so that the page doesn't have
+  // to reload
+  addAgency: function(e) {
+    e.preventDefault();
+
+    var inputs = this.verifyAndExtractInput();
+    if (!inputs) return;
+
+    var self = this;
+
+    var cid = this.countries.idForName(inputs.country);
+    if (cid) {
+      this.model.set('country_id', cid);
+    } else {
+      var cmodel = new Entity({
+        name: inputs.country,
+        type: 1
+      });
+      cmodel.save(null, {
+        success: function(model, reponse) {
+          self.model.set('country_id', response.id);
+        },
+        error: function() {
+          self.alert('false', 'Error adding new country.');
+        }
+      });
+    }
+
+    var tid = this.topics.idForName(inputs.topic);
+    if (tid) {
+      this.model.set('topic_id', tid);
+    } else {
+      var tmodel = new Entity({
+        name: inputs.topic,
+        type: 3
+      });
+      tmodel.save(null, {
+        success: function(model, response) {
+          self.model.set('topic_id', response.id);
+        },
+        error: function() {
+          self.alert('false', 'Error adding new topic.');
+        }
+      });
+    }
+
+    if (!this.model.get('country_id') || !this.model.get('topic_id')) {
+      this.alert('false', 'Error adding a new country and topic');
+      return;
+    }
+
+    this.model.save(
+      {
+        agency_name: inputs.agency,
+        contact_name: inputs.contact,
+        email: inputs.email,
+      },
+      {
+        success: function(model, response) {
+          self.model = new Agency();
+          self.render();
+          // TODO render all table views
+          self.alert(true, 'Successfully added agency.');
+        },
+        error: function(model, response) {
+          self.alert(false, 'Error adding agency.');
+        }
+      }
+    );
+  },
+
+  agencyEnter: function(e) {
+    if (e.keyCode == 13) this.addAgency(e);
   }
 
 });
@@ -216,95 +337,6 @@ var CCFormView = FOIAView.extend({
 
 });
 
-var CATFormView = FOIAView.extend({
-
-  initialize: function() {
-    this.template = _.template($('#cat-template').html());
-  },
-
-  events: {
-    'click #new-cat-relation a.add-cat':'addCAT',
-    'keypress #new-cat-relation input':'addCATEnter'
-  },
-
-  render: function() {
-    $(this.el).html(this.template());
-
-    this.countries = new CountryCollection();
-    this.countries.fetch();
-    this.$('input.country').typeahead({
-      source: this.countries.nameArray()
-    });
-
-    this.agencies = new AgencyCollection();
-    this.agencies.fetch();
-    this.$('input.agency').typeahead({
-      source: this.agencies.nameArray()
-    });
-
-    this.topics = new TopicCollection();
-    this.topics.fetch();
-    this.$('input.topic').typeahead({
-      source: this.topics.nameArray()
-    });
-    return this;
-  },
-
-  addCAT: function(e) {
-    e.preventDefault();
-
-    if ($('#new-cat-relation input.country').val().length == 0) {
-      this.alert(false, 'Please enter a country for this relation.');
-      return;
-    }
-
-    if ($('#new-cat-relation input.agency').val().length == 0) {
-      this.alert(false, 'Please enter an agency for this relation.');
-      return;
-    }
-
-    if ($('#new-cat-relation input.topic').val().length == 0) {
-      this.alert(false, 'Please enter a topic for this relation.');
-      return;
-    }
-
-    var cid =
-      this.countries.idForName($('#new-cat-relation input.country').val());
-    var aid =
-      this.agencies.idForName($('#new-cat-relation input.agency').val());
-    var tid = this.topics.idForName($('#new-cat-relation input.topic').val());
-
-    if (!cid || !aid || !tid) {
-      this.alert(false, 'Please use values from the typeahead.');
-      return;
-    }
-
-    var self = this;
-
-    this.model.set({
-      cid: cid,
-      aid: aid,
-      tid: tid
-    });
-    this.model.addCATRelation({
-      success: function() {
-        self.model = new CATRelationModel();
-        self.render();
-        self.alert(true, 'Successfully added relation.');
-      },
-      error: function () {
-        self.alert(false,
-          'Oops! Something went wrong when saving this relation.');
-      }
-    });
-  },
-
-  addCATEnter: function(e) {
-    if (e.keyCode == 13) this.addCAT(e);
-  }
-
-});
-
 var FormsView = Backbone.View.extend({
 
   initialize: function() {
@@ -319,21 +351,11 @@ var FormsView = Backbone.View.extend({
   populate: function() {
 
     // These populate forms for new entities
-    if (!this.countryFormView) {
-      var country = new Entity({type: 1});
-      this.countryFormView = new EntityFormView({model:country});
-    }
-    $('#new-country').append(this.countryFormView.render().el);
     if (!this.agencyFormView) {
-      var agency = new Entity({type: 2});
-      this.agencyFormView = new EntityFormView({model:agency});
+      var agency = new Agency();
+      this.agencyFormView = new AgencyFormView({model:agency});
     }
     $('#new-agency').append(this.agencyFormView.render().el);
-    if (!this.topicFormView) {
-      var topic = new Entity({type: 3});
-      this.topicFormView = new EntityFormView({model:topic});
-    }
-    $('#new-topic').append(this.topicFormView.render().el);
 
     // These populate forms for new relations
     if (!this.ccFormView) {
@@ -341,11 +363,6 @@ var FormsView = Backbone.View.extend({
       this.ccFormView = new CCFormView({model: relation});
     }
     $('#new-cc-relation').append(this.ccFormView.render().el);
-    if (!this.catFormView) {
-      var catRelation = new CATRelationModel();
-      this.catFormView = new CATFormView({model:catRelation});
-    }
-    $('#new-cat-relation').append(this.catFormView.render().el);
 
     // These populate the database lookup tables for entities
     if (!this.countryTableView) {

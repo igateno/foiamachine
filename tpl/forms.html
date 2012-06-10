@@ -1,15 +1,7 @@
 <div id="entity-inserts" class="span3">
 
-  <div id="new-country">
-    <h2>New Country</h2>
-  </div>
-
   <div id="new-agency">
     <h2>New Agency</h2>
-  </div>
-
-  <div id="new-topic">
-    <h2>New Topic</h2>
   </div>
 
 </div> <!-- entity-inserts -->
@@ -19,10 +11,6 @@
   <div id="new-cc-relation">
     <h2>New Country-Country</h2>
   </div> <!-- new-cc-relation -->
-
-  <div id="new-cat-relation">
-    <h2>New Country-Agency-Topic</h2>
-  </div>
 
 </div> <!-- relation-inserts -->
 
@@ -87,18 +75,34 @@
 
 </div>
 
-<!-- Form to insert a new entity -->
-<script id="new-entity-template" type="text/template">
-  <form class="new-entity">
+<!-- Form to insert a new agency -->
+<script id="new-agency-template" type="text/template">
+  <form class="new-agency">
     <fieldset>
       <div>
         <label for="name">Name:</label>
         <input class="name" type="text" name="name">
       </div>
+      <div>
+        <label for="country">Country:</label>
+        <input class="country" type="text" name="country">
+      </div>
+      <div>
+        <label for="topic">Topic:</label>
+        <input class="topic" type="text" name="topic">
+      </div>
+      <div>
+        <label for="contact">Contact:</label>
+        <input class="contact" type="text" name="contact">
+      </div>
+      <div>
+        <label for="email">Email:</label>
+        <input class="email" type="text" name="email">
+      </div>
     </fieldset>
 
     <div>
-      <a class="btn add-entity">Add</a>
+      <a class="btn add-agency">Add</a>
     </div>
   </form>
 </script>
@@ -120,30 +124,6 @@
 
     <div>
       <a class="btn add-cc">Add</a>
-    </div>
-  </form>
-</script>
-
-<!-- form to add a new country-agency-topic relation -->
-<script id="cat-template" type="text/template">
-  <form>
-    <fieldset>
-      <input class="country"
-             type="text"
-             data-provide="typeahead"
-             placeholder="Country">
-      <input class="agency"
-             type="text"
-             data-provide="typeahead"
-             placeholder="Agency">
-      <input class="topic"
-             type="text"
-             data-provide="typeahead"
-             placeholder="Topic">
-    </fieldset>
-
-    <div>
-      <a class="btn add-cat">Add</a>
     </div>
   </form>
 </script>
