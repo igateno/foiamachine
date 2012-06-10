@@ -5,6 +5,8 @@ var LoginView = FOIAView.extend({
   },
 
   events: {
+    'click #request-start input.gobtn': 'startRequest',
+    'keypress #request-start input.country': 'startRequestEnter',
     'click #login button': 'login',
     'keypress #login input': 'loginEnter',
     'click #register a.register': 'register',
@@ -13,7 +15,47 @@ var LoginView = FOIAView.extend({
 
   render: function() {
     $(this.el).addClass('span12').html(this.template());
+
+    var self = this;
+
+    this.countries = new CountryCollection();
+    this.countries.fetch({
+      success: function(model, response) {
+        self.$('#request-start input.country').typeahead({
+          source: self.countries.nameArray()
+        });
+      },
+      error: function() {
+        self.alert(false, 'There was an error loading the page.');
+      }
+    });
+
     return this
+  },
+
+  startRequest: function(e) {
+    e.preventDefault();
+
+    var cname = $('#request-start input.country').val();
+
+    if (cname.length == 0) return;
+
+    var cid = this.countries.idForName(cname);
+    if (cid == null) {
+      this.alert(false, "We're sorry. That country is not supported yet.");
+      return;
+    }
+
+    var request = new Request({
+      country: cid,
+      country_name: cname
+    });
+    app.requestView = new RequestView({model: request});
+    $('#container').html(app.requestView.render().el);
+  },
+
+  startRequestEnter: function(e) {
+    if (e.keyCode == 13) this.startRequest(e);
   },
 
   login: function(e) {

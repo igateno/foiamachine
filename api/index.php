@@ -391,11 +391,11 @@
   }
 
   function agencyTabs() {
-    if (!validateToken()) {
+    /*if (!validateToken()) {
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error": "invalid token"}';
       return;
-    }
+    }*/
 
     $results = agencyTabsQuery();
 

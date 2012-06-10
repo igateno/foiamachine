@@ -1,32 +1,43 @@
 var RequestView = FOIAView.extend({
 
   initialize: function() {
-    this.template = _.template(tpl.get('request'));
+    this.template = _.template(tpl.get('request-carousel'));
   },
 
   events: {
     'click #request-countries a': 'tabs',
-    'click #new-request input.btn': 'load_topics',
     'click #new-request input#topicBtn': 'load_tabs',
     'click #new-request input#agencyBtn': 'load_question',
     'click #new-request input#qBtn': 'load_datepickers',
-    'click #new-request input#dateBtn': 'preview_request',
-    'click .doctypes button': 'toggle_doctype'
+    'click #new-request input#dateNext': 'save_date',
+    'click #new-request input#dateSkip': 'skip_date',
+    'click #new-request input#docsNext': 'save_docs',
+    'click #new-request input#docsSkip': 'skip_docs'
   },
 
   partials: {
-    doc_buttons: '<button id="<%= id %>" class="btn"><%= name %></button>',
+    doc_li: '<li><input id="<%= id %>" type="checkbox"><%= name %></input></li>',
     tabs: '<li><a data-target="#<%= div_id %>" data-toggle="tab"><%= agency %></a></li>'
   },
 
   render: function() {
     $(this.el).addClass('row-fluid').html(this.template(this.model.toJSON()));
 
-    this.countries = new CountryCollection();
-    this.countries.fetch();
-    this.$('#new-request input.country').typeahead({
-      source: this.countries.nameArray()
+    var self = this;
+
+    this.topics = new TopicCollection();
+    this.topics.fetch({
+      success: function (model, response) {
+        $('#topic input.topic').typeahead({
+          source: self.topics.nameArray()
+        });
+      },
+      error: function() {
+        self.alert(false, 'There was an error loading the topics.');
+      }
     });
+
+    this.$('#request-carousel').carousel({interval: 0});
 
     return this;
   },
@@ -40,31 +51,6 @@ var RequestView = FOIAView.extend({
     $(e.target).detach();
     var template = _.template($(selector).html());
     $('#new-request form fieldset').append(template);
-  },
-
-  load_topics: function(e) {
-    e.preventDefault();
-
-    if ($('#new-request input.country').val().length == 0) {
-      this.alert(false, 'Please, start by typing in a country name.');
-      return;
-    }
-
-    var cid = this.countries.idForName($('#new-request input.country').val());
-    if (cid == null) {
-      this.alert(false, 'Invalid country name.');
-      return;
-    }
-
-    this.model.set('country', cid);
-
-    this.append_next(e, '#topic-template');
-
-    this.topics = new TopicCollection();
-    this.topics.fetch();
-    $('#topic input').typeahead({
-      source: this.topics.nameArray()
-    });
   },
 
   build_tabs: function(element, index, list) {
@@ -91,38 +77,33 @@ var RequestView = FOIAView.extend({
   load_tabs: function(e) {
     e.preventDefault();
 
-    if ($('#new-request input.topic').val().length == 0) {
+    var tname = $('#new-request input.topic').val();
+    if (tname.length == 0) {
       this.alert(false, 'What is your request about?');
       return;
     }
 
     var self = this;
 
-    var tid = this.topics.idForName($('#new-request input.topic').val());
+    var tid = this.topics.idForName(tname);
 
     if (tid == null) {
       this.alert(false, 'Invalid topic.');
       return;
     }
 
-    this.model.set('topic', tid);
-    this.model.save(null, {
-      success: function (model, response) {
-        self.model.set('id', response.id);
-        self.model.fetchSuggestions({
-          success: function() {
-            self.append_next(e, '#agency-template');
-            _.each(self.model.get('suggestions'), self.build_tabs, self);
-            $('#agency-tabs a:first').tab('show');
-          },
-          error: function() {
-            self.alert(false,
-              "Oops! Somethind went wrong while loading suggestions");
-          }
-        });
+    this.model.set({topic: tid, topic_name: tname});
+    this.model.fetchSuggestions({
+      success: function() {
+        var template = _.template($('#agency-template').html());
+        $('#suggestions').html(template());
+        _.each(self.model.get('suggestions'), self.build_tabs, self);
+        $('#agency-tabs a:first').tab('show');
+        $('#request-carousel').carousel('next');
       },
-      error: function (model, response) {
-        self.alert(false, "Well, that wasn't supposed to happen...");
+      error: function() {
+        self.alert(false,
+          "Oops! Somethind went wrong while loading suggestions");
       }
     });
 
@@ -137,18 +118,11 @@ var RequestView = FOIAView.extend({
     }
 
     var self = this;
-    this.model.setAgencies($('#agencies :checkbox:checked'),
-      {
-        success: function() {
-          // nothing?
-        },
-        error: function() {
-          self.alert(false,
-            "Oops! Something went wrong while saving your selected agencies.");
-        }
-      }
-    );
-    this.append_next(e, '#question-template');
+    this.model.setCheckboxes($('#agencies :checkbox:checked'), 'agency_ids');
+
+    var template = _.template($('#question-template').html());
+    $('#question').html(template());
+    $('#request-carousel').carousel('next');
   },
 
   load_datepickers: function(e) {
@@ -162,35 +136,13 @@ var RequestView = FOIAView.extend({
     var self = this;
 
     this.model.set('question', $('#new-request textarea').val());
-    this.model.save(null, {
-      success: function (model, response) {
-        self.append_next(e, '#date-doctype-template');
-        var date_template = _.template($('#datepicker-template').html());
-        $('span.date-container.start').html(date_template());
-        $('span.date-container.end').html(date_template());
 
-        var docTemplate = _.template(self.partials.doc_buttons);
-        self.doctypes = new DoctypeCollection();
-        self.doctypes.fetch({
-          success: function(collection) {
-            _.each(collection.models, function(element, index, list) {
-              $('#new-request .doctypes').append(docTemplate({
-                id: element.get('id'),
-                name: element.get('name')
-              }));
-            }, self);
-          }
-        });
-      },
-      error: function (model, response) {
-        self.alert(false, "Well, that wasn't supposed to happen...");
-      }
-    });
-  },
-
-  toggle_doctype: function(e) {
-    e.preventDefault();
-    $(e.target).attr('id');
+    var template = _.template($('#date-template').html());
+    $('#date').html(template());
+    var date_template = _.template($('#datepicker-template').html());
+    $('span.date-container.start').html(date_template());
+    $('span.date-container.end').html(date_template());
+    $('#request-carousel').carousel('next');
   },
 
   get_date: function(str) {
@@ -198,6 +150,60 @@ var RequestView = FOIAView.extend({
     var month = $('span.date-container.' + str + ' select.month').val();
     var day = $('span.date-container.' + str + ' select.day').val();
     return year + '-' + month + '-' + day;
+  },
+
+  save_date: function(e) {
+    e.preventDefault();
+
+    this.model.set('start', this.get_date('start'));
+    this.model.set('end', this.get_date('end'));
+
+    this.render_doctypes(e);
+  },
+
+  skip_date: function(e) {
+    e.preventDefault();
+    this.render_doctypes(e);
+  },
+
+  render_doctypes: function(e) {
+    var template = _.template($('#doctypes-template').html());
+    $('#doctypes').html(template());
+
+    var self = this;
+
+    var docTemplate = _.template(self.partials.doc_li);
+    this.doctypes = new DoctypeCollection();
+    this.doctypes.fetch({
+      success: function(collection) {
+        _.each(collection.models, function(element, index, list) {
+          $('#doctypes ul').append(docTemplate({
+            id: element.get('id'),
+            name: element.get('name')
+          }));
+        }, self);
+      }
+    });
+
+    $('#request-carousel').carousel('next');
+  },
+
+  save_docs: function(e) {
+    e.preventDefault();
+    this.model.setCheckboxes($('.btn-group button.active'), 'doctype_ids');
+    this.load_registration();
+  },
+
+  skip_docs: function(e) {
+    e.preventDefault();
+    this.load_registration();
+  },
+
+  load_registration: function() {
+    $('#register-modal').modal('show');
+    // register the user
+    // save the model
+    // preview the request
   },
 
   generate_previews: function (prev) {
@@ -224,38 +230,16 @@ var RequestView = FOIAView.extend({
   },
 
   preview_request: function(e) {
-    e.preventDefault();
-    this.model.set('start', this.get_date('start'));
-    this.model.set('end', this.get_date('end'));
-
     var self = this;
-    this.model.setDoctypes($('.btn-group button.active'),
-      {
-        success: function() {
-          // nothing?
-        },
-        error: function() {
-          self.alert(false,
-            "Oops! Something went wrong while saving your selected documents.");
-        }
-      }
-    );
 
-    this.model.save(null, {
-      success: function(model, response) {
-        self.model.fetchPreviews({
-          success: function() {
-            self.generate_previews(self.model.get('previews'));
-            $('#request-preview .nav-tabs a:first').tab('show');
-          },
-          error: function() {
-            self.alert(false,
-              "Oops! Something went wrong while generating your requests...");
-          }
-        });
+    this.model.fetchPreviews({
+      success: function() {
+        self.generate_previews(self.model.get('previews'));
+        $('#request-preview .nav-tabs a:first').tab('show');
       },
-      error: function(model, response) {
-        self.alert(false, "Well, that wasn't supposed to happen...");
+      error: function() {
+        self.alert(false,
+          "Oops! Something went wrong while generating your requests...");
       }
     });
   },

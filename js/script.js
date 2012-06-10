@@ -84,6 +84,7 @@ var FOIARouter = Backbone.Router.extend({
 var templates = [
   'header',
   'request',
+  'request-carousel',
   'letters/us',
   'letters/serbia-english',
   'agency-tab',
