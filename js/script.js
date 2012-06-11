@@ -5,7 +5,6 @@ var FOIARouter = Backbone.Router.extend({
   routes: {
     '':'login',
     'login':'login',
-    'request':'request',
     'dash':'dashboard',
     'forms':'forms',
   },
@@ -33,17 +32,6 @@ var FOIARouter = Backbone.Router.extend({
     $('#container').html(this.loginView.el);
   },
 
-  request: function() {
-    this.assertAuth(function() {
-      if (!this.requestView) {
-        var request = new Request();
-        this.requestView = new RequestView({model: request});
-        this.requestView.render();
-      }
-      $('#container').html(this.requestView.el);
-    });
-  },
-
   dashboard: function() {
     this.assertAuth(function() {
       if (!this.dashView) {
@@ -63,28 +51,15 @@ var FOIARouter = Backbone.Router.extend({
       $('#container').html(this.formsView.el);
       this.formsView.populate();
     });
-    /*this.elist = new EntityCollection();
-    this.elist.fetch({
-      success: function(collection) {
-        var elistView = new EntityListView({model: collection});
-        $('#entity-list').html(elistView.render().el);
-      }
-    });
-    this.rlist = new RelationCollection();
-    this.rlist.fetch({
-      success: function(collection) {
-        var rlistView = new RelationListView({model: collection});
-        $('#relation-list').html(rlistView.render().el);
-      }
-    });*/
   }
 
 });
 
 var templates = [
   'header',
-  'request',
+  'request-carousel',
   'letters/us',
+  'letters/serbia-english',
   'agency-tab',
   'agency-div',
   'agency-checkbox',

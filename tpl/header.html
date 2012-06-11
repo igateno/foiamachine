@@ -2,11 +2,12 @@
   <div class="navbar-inner">
     <div class="container">
       <a class="brand" href="#dash">FOIA Machine</a>
-      <ul class="nav">
-        <li><a class="dash">Dash</a></li>
-        <li><a class="request">New Request</a></li>
-        <li><a class="forms">Forms</a></li>
-        <li><a class="logout">Logout</a></li>
+      <ul class="nav pull-right">
+        <% if (authed) { %>
+          <%= '<li><a class="logout">Logout</a></li>' %>
+        <% } else { %>
+          <%= '<li><a data-target="#signin-modal" data-toggle="modal">Sign In</a></li>' %>
+        <% } %>
       </ul>
     </div>
   </div>

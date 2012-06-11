@@ -1,14 +1,17 @@
 <!-- Letter template for US FOIA request -->
 <!-- Language taken from http://www2.ed.gov/policy/gen/leg/foia/templates/foia_request_template.pdf -->
-<div id="<%= div_id %>" class="tab-pane">
+<div id="<%= div_id %>" class="tab-pane" data-aid="<%= agency_id %>">
   <p><%= agency_name %></p>
-  <p>Dear FOIA Public Liason</p>
+  <p>Dear <%= contact_name %></p>
   <p>This is a request under the Freedom of Information Act</p>
   <p>
     I request that a copy of all
     <% _.each(docs, function (element, index, list) {  %>
       <%= element %>,
     <% }); %>
+    <% if (start_date && end_date) { %>
+      produced between <%= start_date %> and <%= end_date %>,
+    <% } %>
     containing the following information be delivered to me:
   </p>
   <p><%= question %></p>

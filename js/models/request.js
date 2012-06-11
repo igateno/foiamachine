@@ -1,44 +1,17 @@
-var RequestAgency = Backbone.Model.extend({
+var RequestEmail = Backbone.Model.extend({
 
-  urlRoot: 'api/requestAgencies',
+  url: 'api/requestEmails',
 
-  defaults: function() {
+  defaults: function () {
     return {
+      request_log_id: 0,
+      subject: '',
+      body: '',
+      outgoing: 0,
       username: $.cookie('username'),
-      token: $.cookie('token'),
-      request_log_id: null,
-      agency_id: null
+      token: $.cookie('token')
     }
   }
-});
-
-var RequestAgencyCollection = FoiaCollection.extend({
-
-  model: RequestAgency,
-
-  url: 'api/requestAgencies',
-
-});
-
-var RequestDoctype = Backbone.Model.extend({
-
-  urlRoot: 'api/requestDoctypes',
-
-  defaults: function() {
-    return {
-      username: $.cookie('username'),
-      token: $.cookie('token'),
-      request_log_id: null,
-      doctype_id: null
-    }
-  }
-});
-
-var RequestDoctypeCollection = FoiaCollection.extend({
-
-  model: RequestDoctype,
-
-  url: 'api/requestDoctypes'
 
 });
 
@@ -91,42 +64,11 @@ var Request = Backbone.Model.extend({
     });
   },
 
-  setAgencies: function(checkboxes, callbacks) {
-    this.set('agencies', new RequestAgencyCollection())
+  setCheckboxes: function(checkboxes, key) {
+    this.set(key, []);
     _.each(checkboxes, function(element, index, list) {
-      this.get('agencies').create(
-      {
-        request_log_id: this.id,
-        agency_id: element.id
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      });
+      this.get(key).push(element.id);
     }, this);
   },
 
-  setDoctypes: function(buttons, callbacks) {
-    this.set('doctypes', new RequestDoctypeCollection())
-    _.each(buttons, function(element, index, list) {
-      this.get('doctypes').create(
-      {
-        request_log_id: this.id,
-        doctype_id: $(element).attr('id')
-      },
-      {
-        success: function(model, response) {
-          callbacks.success();
-        },
-        error: function(model, response) {
-          callbacks.error()
-        }
-      }
-      );
-    }, this);
-  }
 });

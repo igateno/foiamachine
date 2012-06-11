@@ -1,64 +1,51 @@
-<div class="hero-unit">
+<div class="landing-page">
+  <div class="hero-unit">
 
-  <h1>The FOIA Machine</h1>
+    <h1>Welcome to the FOIA Machine</h1>
 
-  <div class="row-fluid">
-    <div id="login" class="span6">
+    <div class="row-fluid">
+      <div id="request-start">
+        <form>
+          <fieldset>
+            <input class="big country"
+                   name="country"
+                   type="text"
+                   placeholder="Which country would you like to learn about?"
+                   autofocus>
+            <input class="gobtn" type="submit" value="Go">
+          </fieldset>
+        </form>
+      </div> <!-- request-start -->
+    </div> <!-- row-fluid -->
+
+  </div> <!-- hero-unit -->
+</div> <!-- landing-page -->
+
+<div class="modal hide" id="signin-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">x</button>
+    <h1>Sign In</h1>
+  </div> <!-- modal-header -->
+  <div id="login">
+    <div class="modal-body">
       <form>
         <fieldset>
-          <legend>Existing user?</legend>
           <div class="username">
             <label for="username">Username:</label>
-            <input name="username" type="text" required autofocus>
-          </div> <!-- username -->
+            <input name="username" type="text" autofocus>
+          </div>
           <div class="password">
             <label for="password">Password:</label>
-            <input name="password" type="password" required>
-          </div> <!-- password -->
+            <input name="password" type="password">
+          </div>
         </fieldset>
-
-        <div>
-          <a class="btn login">Sign In</a>
-        </div>
-
-      <form> <!-- login -->
-    </div> <!-- span6 -->
-
-    <div id="register" class="span6">
-      <form>
-        <fieldset>
-          <legend>New user?</legend>
-          <div class="username">
-            <label for="username">Username:</label>
-            <input name="username" type="text" required autofocus>
-          </div> <!-- username -->
-          <div class="email">
-            <label for="email">Email:</label>
-            <input name="email" type="email" required>
-          </div> <!-- email -->
-          <div class="password1">
-            <label for="password1">Password:</label>
-            <input name="password1" type="password" required>
-          </div> <!-- password1 -->
-          <div class="password2">
-            <label for="password2">Again, please:</label>
-            <input name="password2" type="password" required>
-          </div> <!-- password2 -->
-          <div class="code">
-            <label for="code">Access code:</label>
-            <input name="code" type="password" required>
-          </div> <!-- code -->
-        </fieldset>
-
-        <div>
-          <a class="btn register">Register</a>
-        </div>
-
       </form>
-    </div> <!-- span6 -->
-  </div> <!-- row-fluid -->
-
-</div> <!-- signin-form -->
+    </div> <!-- modal-body -->
+    <div class="modal-footer">
+      <button class="btn">Sign In</button>
+    </div> <!-- modal-footer -->
+  </div> <!-- login -->
+</div> <!-- modal -->
 
 <!-- feedback alert -->
 <script id="alert-template" type="text/template">
