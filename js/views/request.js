@@ -281,6 +281,7 @@ var RequestView = FOIAView.extend({
       var div_template = _.template(tpl.get('letters/' + tplname));
       $('#request-preview .tab-content').append(div_template({
         div_id: 'prev'+index,
+        agency_id: index,
         agency_name: element.agency_name,
         contact_name: element.contact_name,
         docs: prev.doctypes,
@@ -316,6 +317,7 @@ var RequestView = FOIAView.extend({
     _.each(letters, function(element, index, list) {
       var requestEmail = new RequestEmail({
         request_log_id: this.model.get('id'),
+        agency_id: $(element).attr('data-aid'),
         subject: 'Freedom of Information Request',
         body: $(element).html(),
         outgoing: 1

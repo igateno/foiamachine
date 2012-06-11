@@ -545,6 +545,7 @@
   //
   /////////////////////////////////////////////////////////////////////////
 
+  // TODO this should trigger the actual sending of an email
   function addRequestEmail(){
     $id = validateToken();
     if (!$id) {
@@ -559,9 +560,9 @@
     $timestamp = date('Y-m-d H:i:s');
 
     $sql1 = 'insert into request_emails'.
-            '(request_log_id, subject, body, outgoing)'.
+            '(request_log_id, agency_id, subject, body, outgoing)'.
             'values'.
-            '(:request_log_id, :subject, :body, :outgoing)';
+            '(:request_log_id, :agency_id, :subject, :body, :outgoing)';
     $sql2 = 'insert into request_reminders (request_log_id, next_send_date)'.
             'values (:request_log_id, :next_send_date)';
 
@@ -570,6 +571,7 @@
     try {
       $stmt = $db->prepare($sql1);
       $stmt->bindParam('request_log_id', $params->request_log_id);
+      $stmt->bindParam('agency_id', $params->agency_id);
       $stmt->bindParam('subject', $params->subject);
       $stmt->bindParam('body', $params->body);
       $stmt->bindParam('outgoing', $params->outgoing);
@@ -589,16 +591,4 @@
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
-  }
-
-
-  //////////////////////////////////////////////////////////////////////////
-  //
-  // Mail Request
-  //
-  /////////////////////////////////////////////////////////////////////////
-
-  function sendMail($to, $subject, $message){
-      $message = wordwrap($message, 70);
-      mail($to, $subject, $message);
   }
