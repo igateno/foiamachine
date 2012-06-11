@@ -1,6 +1,7 @@
 <?php
 	
     require 'mailer.php';
+    require 'dbconnect.php';
     $attachmentDir = "/home/foiamachine/documents/";
 
     /* adapted from http://www.daniweb.com/web-development/php/threads/113444/php-imap-save-attachment-and-email */
@@ -55,34 +56,6 @@
 	     }
 	 }
     }
-  
-    /* adapted fro http://sb2.info/php-script-html-plain-text-convert */
-    function html2text($html)
-    {
-	$tags = array (
-   	       0 => '~<h[123][^>]+>~si',
-	       1 => '~<h[456][^>]+>~si',
-  	       2 => '~<table[^>]+>~si',
-    	       3 => '~<tr[^>]+>~si',
-    	       4 => '~<li[^>]+>~si',
-    	       5 => '~<br[^>]+>~si',
-    	       6 => '~<p[^>]+>~si',
-	       7 => '~<div[^>]+>~si',
-    	       );
-	 
-	 $html = preg_replace($tags,"\n",$html);
-	 $html = preg_replace('~</t(d|h)>\s*<t(d|h)[^>]+>~si',' - ',$html);
-    	 $html = preg_replace('~<[^>]+>~s','',$html);
-    
-	 // reducing spaces
-    	 $html = preg_replace('~ +~s',' ',$html);
-    	 $html = preg_replace('~^\s+~m','',$html);
-    	 $html = preg_replace('~\s+$~m','',$html);
-    	 
-	 // reducing newlines
-    	 $html = preg_replace('~\n+~s',"\n",$html);
-    	 return $html;
-    }
 
     function existAttachment($part){
        if(isset($part->parts)){
@@ -128,36 +101,36 @@
 	     /* extract request id from the subject */
 
 	     $seen = $overview[0]->seen;
-	     print $email_number;
-	     print '<br/>';
 	     if(!$seen){
 	     	  $body = imap_fetchbody($mbox, $email_number, 2);
 	     	  $sub = $overview[0]->subject;
 	     	  $index1 = strpos($sub, 'foiaid:') + strlen('foiaid:');
 	     	  $index2 = strpos($sub, '-', index1);
-	     	  $request_log_id = intval($sub, index1, index2 - index1);
-	     	  $agency_id = intval($sub, index2+1, strlen($sub) - index2 + 1);
+	     	  $request_log_id = intval(substr($sub, $index1, $index2 - $index1));
+	     	  $agency_id = intval(substr($sub, $index2+1, strlen($sub) - $index2 - 2));
+		  
 	     	  $from = $overview[0]->from;
-	     	  $sql = 'select E.name as agency, U.name as user, U.email as user_email, 
-	     	  		from entities E, users U, request_log R, request_log_agencies RA where
-	     	  		R.id = :request_log_id and R.id = RA.request_log_id and 
-	     	  		RA.agency_id = :agency_id and R.user_id = U.id';
+	     	  $sql = 'select U.email as user_email from users U, request_log R, request_log_agencies RA  
+		       where R.id = :request_log_id and R.id = RA.request_log_id and 
+		       RA.agency_id = :agency_id and R.user_id = U.id';
 	     	  $db = getConnection();
 	     	  $stmt = $db->prepare($sql);
-	     	  $result = $stmt->execute();
-	     	  sendMail($from, $result['user_email'], $result['agency'], $result['user'], 
-	     	  		$sub, html2text($body));
+		  $stmt->bindParam('request_log_id', $request_log_id);
+		  $stmt->bindParam('agency_id', $agency_id);
+		  $stmt->execute();
+    		  $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    		  $result = $results[0];
+	     	  sendMail($from, $result->user_email, $sub, $body);
 	     	  		
-	     	  $sql2 = 'insert into request_emails 
+	     	  $sql2 = 'insert into request_emails
 	     	  		(request_log_id, agency_id, subject, body, outgoing) 
-		     	  	values(:request_log_id, :agency_id, :subject, :body, 0)';
-		      $stmt->bindParam('request_log_id', $request_log_id);
-		      $stmt->bindParam('agency_id', $agency_id);
-		      $stmt->bindParam('subject', $sub);
-		      $stmt->bindParam('body', $body);
-			  $stmt->execute();
-		     	  	
-	     	  updateDatabase();
+		     	  	 values( :request_log_id, :agency_id, :subject, :body, 0)';
+		  $stmt = $db->prepare($sql2);
+		  $stmt->bindParam('request_log_id', $request_log_id);
+		  $stmt->bindParam('agency_id', $agency_id);
+		  $stmt->bindParam('subject', $sub);
+		  $stmt->bindParam('body', $body);
+		  $stmt->execute();
 	     }
 	  }
        }

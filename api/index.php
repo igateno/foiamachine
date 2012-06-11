@@ -27,9 +27,7 @@
   $app->get('/doctypes', 'getDoctypes');
 
   // Relations
-  $app->get('/ccRelations', 'getCCRelations');
   $app->post('/ccRelations', 'addCCRelation');
-  $app->get('/catRelations', 'getCATRelations');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
@@ -37,9 +35,11 @@
 
   // Request Log
   $app->post('/requestLog', 'addRequestLog');
+  $app->post('/requestRows', 'getRequestRows');
 
   // Request Emails
   $app->post('/requestEmails', 'addRequestEmail');
+  $app->post('/viewRequest', 'getRequestEmails');
 
   $app->run();
 
@@ -540,6 +540,31 @@
     }
   }
 
+  function getRequestRows() {
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = file_get_contents('../db/queries/request_rows.sql');
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('id', $id);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      echo json_encode($results);
+    } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
   //////////////////////////////////////////////////////////////////////////
   //
   // Request Emails
@@ -568,16 +593,16 @@
             'values (:request_log_id, :next_send_date)';
 
 	$sql3 = 'update request_log set approved = 1 where id = :request_log_id';
-	
-	$subject_id = ' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']'; 
-	
+
+	$subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']';
+
     $db = getConnection();
     $db->beginTransaction();
     try {
       $stmt = $db->prepare($sql1);
       $stmt->bindParam('request_log_id', $params->request_log_id);
       $stmt->bindParam('agency_id', $params->agency_id);
-      $stmt->bindParam('subject', $params->subject.$subject_id);
+      $stmt->bindParam('subject', $subject);
       $stmt->bindParam('body', $params->body);
       $stmt->bindParam('outgoing', $params->outgoing);
       $stmt->execute();
@@ -588,11 +613,11 @@
       // the next_send_date today is just for the demo
       $stmt->bindParam('next_send_date', $timestamp);
       $stmt->execute();
-	  
+
 	  $stmt = $db->prepare($sql3);
 	  $stmt->bindParam('request_log_id', $params->request_log_id);
 	  $stmt->execute();
-	  
+
       $db->commit();
       echo '{"status":"ok"}';
     } catch (PDOException $e) {
@@ -600,20 +625,46 @@
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
-    
-    sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where 
-    		E.id = :agency_id and AD.agency_id = :agency_id';
-    		
+
+    $sql4 = 'select email from agency_data where agency_id = :agency_id';
+
     $stmt = $db->prepare($sql4);
     $stmt->bindParam('agency_id', $params->agency_id);
-    $result = $stmt->query();
-    sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'], 
-    	$params->subject.$subject_id, $params->body);
-    	
+    $stmt->execute();
+    if(count($results) > 0){
+        sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
+    }
+
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
-	$stmt->bindParam('request_log_id', params->request_log_id);
+	$stmt->bindParam('request_log_id', $params->request_log_id);
 	$stmt->execute();
-	
+
     $db = null;
+  }
+
+  function getRequestEmails() {
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = file_get_contents('../db/queries/request_emails.sql');
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('request_log_id', $params->id);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      echo json_encode($results);
+    } catch (PDOException $e) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
   }
