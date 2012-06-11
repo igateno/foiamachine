@@ -569,7 +569,7 @@
 
 	$sql3 = 'update request_log set approved = 1 where id = :request_log_id';
 	
-	$subject_id = ' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']'; 
+	$subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']'; 
 	
     $db = getConnection();
     $db->beginTransaction();
@@ -577,7 +577,7 @@
       $stmt = $db->prepare($sql1);
       $stmt->bindParam('request_log_id', $params->request_log_id);
       $stmt->bindParam('agency_id', $params->agency_id);
-      $stmt->bindParam('subject', $params->subject.$subject_id);
+      $stmt->bindParam('subject', $subject);
       $stmt->bindParam('body', $params->body);
       $stmt->bindParam('outgoing', $params->outgoing);
       $stmt->execute();
@@ -601,19 +601,21 @@
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
     
-    $sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where 
-    		E.id = :agency_id and AD.agency_id = :agency_id';
+    $sql4 = 'select AD.email as email from agency_data AD where 
+    	  AD.agency_id = :agency_id';
     		
     $stmt = $db->prepare($sql4);
     $stmt->bindParam('agency_id', $params->agency_id);
-    $result = $stmt->query();
-    sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'], 
-    	$params->subject.$subject_id, $params->body);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+    $result = $results[0];
+    sendMail('requestengine@foiamachine.org', $result->email, 
+    	$subject, $params->body);
     	
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
-	$stmt->bindParam('request_log_id', $params->request_log_id);
-	$stmt->execute();
-	
+    $stmt->bindParam('request_log_id', $params->request_log_id);
+    $stmt->execute();
+
     $db = null;
   }
