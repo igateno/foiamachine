@@ -626,14 +626,14 @@
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
 
-    $sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where
-    		E.id = :agency_id and AD.agency_id = :agency_id';
+    $sql4 = 'select email from agency_data where agency_id = :agency_id';
 
     $stmt = $db->prepare($sql4);
     $stmt->bindParam('agency_id', $params->agency_id);
-    $result = $stmt->query();
-    sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'],
-    	$params->subject.$subject_id, $params->body);
+    $stmt->execute();
+    if(count($results) > 0){
+        sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
+    }
 
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);

@@ -101,15 +101,13 @@
 	     /* extract request id from the subject */
 
 	     $seen = $overview[0]->seen;
-	     if(!$seen || $email_number == 5){
+	     if(!$seen){
 	     	  $body = imap_fetchbody($mbox, $email_number, 2);
 	     	  $sub = $overview[0]->subject;
 	     	  $index1 = strpos($sub, 'foiaid:') + strlen('foiaid:');
 	     	  $index2 = strpos($sub, '-', index1);
 	     	  $request_log_id = intval(substr($sub, $index1, $index2 - $index1));
 	     	  $agency_id = intval(substr($sub, $index2+1, strlen($sub) - $index2 - 2));
-		  print $agency_id;
-	     	  print '<br/>';
 		  
 	     	  $from = $overview[0]->from;
 	     	  $sql = 'select U.email as user_email from users U, request_log R, request_log_agencies RA  
@@ -122,7 +120,6 @@
 		  $stmt->execute();
     		  $results = $stmt->fetchAll(PDO::FETCH_OBJ);
     		  $result = $results[0];
-		  print $result->user_email;
 	     	  sendMail($from, $result->user_email, $sub, $body);
 	     	  		
 	     	  $sql2 = 'insert into request_emails
