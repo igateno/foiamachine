@@ -1,6 +1,7 @@
 <?php
   require 'Slim/Slim/Slim.php';
   require 'dbconnect.php';
+  require 'mailer.php';
 
   //////////////////////////////////////////////////////////////////////////
   //
