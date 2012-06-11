@@ -63,27 +63,12 @@ var FOIARouter = Backbone.Router.extend({
       $('#container').html(this.formsView.el);
       this.formsView.populate();
     });
-    /*this.elist = new EntityCollection();
-    this.elist.fetch({
-      success: function(collection) {
-        var elistView = new EntityListView({model: collection});
-        $('#entity-list').html(elistView.render().el);
-      }
-    });
-    this.rlist = new RelationCollection();
-    this.rlist.fetch({
-      success: function(collection) {
-        var rlistView = new RelationListView({model: collection});
-        $('#relation-list').html(rlistView.render().el);
-      }
-    });*/
   }
 
 });
 
 var templates = [
   'header',
-  'request',
   'request-carousel',
   'letters/us',
   'letters/serbia-english',
