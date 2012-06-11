@@ -81,7 +81,8 @@ var DashView = FOIAView.extend({
 
   events: {
     'click #request-menu table tr': 'viewRequest',
-    'click button.new-request':'newRequest'
+    'click button.new-request':'newRequest',
+    'click a.add-agency':'newAgency'
   },
 
   partials: {
@@ -127,6 +128,14 @@ var DashView = FOIAView.extend({
   newRequest: function(e) {
     e.preventDefault();
     app.navigate('', {trigger: true});
+  },
+
+  newAgency: function(e) {
+    e.preventDefault();
+    var agency = new Agency();
+    var agencyFormView = new AgencyFormView({model: agency});
+    $('#new-agency').html(agencyFormView.render().el);
+    $('#agency-modal').modal('show');
   }
 
 });

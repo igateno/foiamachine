@@ -28,7 +28,7 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a data-target="#agency-modal" data-toggle="modal">New Agency</a></li>
+          <li><a class="add-agency">New Agency</a></li>
           <li><a class="add-relation">New Country-Country</a></li>
         </ul>
       </div> <!-- btn-group -->
@@ -44,3 +44,35 @@
   <div id="new-agency">
   </div>
 </div>
+
+<script id="new-agency-template" type="text/template">
+  <div class="modal-body">
+    <form class="new-agency">
+      <fieldset>
+        <div>
+          <label for="name">Name:</label>
+          <input class="name" type="text" name="name">
+        </div>
+        <div>
+          <label for="country">Country:</label>
+          <input class="country" type="text" name="country">
+        </div>
+        <div>
+          <label for="topic">Topic:</label>
+          <input class="topic" type="text" name="topic">
+        </div>
+        <div>
+          <label for="contact">Contact:</label>
+          <input class="contact" type="text" name="contact">
+        </div>
+        <div>
+          <label for="email">Email:</label>
+          <input class="email" type="text" name="email">
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn">Add Agency</button>
+  </div>
+</script>

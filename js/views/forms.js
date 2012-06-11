@@ -105,8 +105,7 @@ var AgencyFormView = FOIAView.extend({
   },
 
   events: {
-    'click a.add-agency': 'addAgency',
-    'keypress input.name': 'agencyEnter'
+    'click #new-agency button': 'addAgency'
   },
 
   render: function() {
@@ -122,7 +121,7 @@ var AgencyFormView = FOIAView.extend({
         });
       },
       error: function() {
-        self.alert('false', 'Error populating agencies.');
+        self.alert(false, 'Error populating agencies.');
       }
     });
 
@@ -134,7 +133,7 @@ var AgencyFormView = FOIAView.extend({
         });
       },
       error: function() {
-        self.alert('false', 'Error populating countries.');
+        self.alert(false, 'Error populating countries.');
       }
     });
 
@@ -146,7 +145,7 @@ var AgencyFormView = FOIAView.extend({
         });
       },
       error: function() {
-        self.alert('false', 'Error populating topics.');
+        self.alert(false, 'Error populating topics.');
       }
     });
 
@@ -213,7 +212,7 @@ var AgencyFormView = FOIAView.extend({
           self.model.set('country_id', response.id);
         },
         error: function() {
-          self.alert('false', 'Error adding new country.');
+          self.alert(false, 'Error adding new country.');
         }
       });
     }
@@ -231,13 +230,13 @@ var AgencyFormView = FOIAView.extend({
           self.model.set('topic_id', response.id);
         },
         error: function() {
-          self.alert('false', 'Error adding new topic.');
+          self.alert(false, 'Error adding new topic.');
         }
       });
     }
 
     if (!this.model.get('country_id') || !this.model.get('topic_id')) {
-      this.alert('false', 'Error adding a new country and topic');
+      this.alert(false, 'Error adding a new country and topic');
       return;
     }
 
@@ -259,10 +258,6 @@ var AgencyFormView = FOIAView.extend({
         }
       }
     );
-  },
-
-  agencyEnter: function(e) {
-    if (e.keyCode == 13) this.addAgency(e);
   }
 
 });
