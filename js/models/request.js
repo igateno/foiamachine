@@ -1,44 +1,17 @@
-var RequestAgency = Backbone.Model.extend({
+var RequestEmail = Backbone.Model.extend({
 
-  urlRoot: 'api/requestAgencies',
+  url: 'api/requestEmails',
 
-  defaults: function() {
+  defaults: function () {
     return {
+      request_log_id: 0,
+      subject: '',
+      body: '',
+      outgoing: 0,
       username: $.cookie('username'),
-      token: $.cookie('token'),
-      request_log_id: null,
-      agency_id: null
+      token: $.cookie('token')
     }
   }
-});
-
-var RequestAgencyCollection = FoiaCollection.extend({
-
-  model: RequestAgency,
-
-  url: 'api/requestAgencies',
-
-});
-
-var RequestDoctype = Backbone.Model.extend({
-
-  urlRoot: 'api/requestDoctypes',
-
-  defaults: function() {
-    return {
-      username: $.cookie('username'),
-      token: $.cookie('token'),
-      request_log_id: null,
-      doctype_id: null
-    }
-  }
-});
-
-var RequestDoctypeCollection = FoiaCollection.extend({
-
-  model: RequestDoctype,
-
-  url: 'api/requestDoctypes'
 
 });
 

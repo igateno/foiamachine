@@ -5,7 +5,6 @@ var FOIARouter = Backbone.Router.extend({
   routes: {
     '':'login',
     'login':'login',
-    'request':'request',
     'dash':'dashboard',
     'forms':'forms',
   },
@@ -31,17 +30,6 @@ var FOIARouter = Backbone.Router.extend({
       this.loginView.render();
     }
     $('#container').html(this.loginView.el);
-  },
-
-  request: function() {
-    this.assertAuth(function() {
-      if (!this.requestView) {
-        var request = new Request();
-        this.requestView = new RequestView({model: request});
-        this.requestView.render();
-      }
-      $('#container').html(this.requestView.el);
-    });
   },
 
   dashboard: function() {

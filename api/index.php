@@ -37,6 +37,9 @@
   // Request Log
   $app->post('/requestLog', 'addRequestLog');
 
+  // Request Emails
+  $app->post('/requestEmails', 'addRequestEmail');
+
   $app->run();
 
   //////////////////////////////////////////////////////////////////////////
@@ -535,6 +538,59 @@
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
   }
+
+  //////////////////////////////////////////////////////////////////////////
+  //
+  // Request Emails
+  //
+  /////////////////////////////////////////////////////////////////////////
+
+  function addRequestEmail(){
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $timestamp = date('Y-m-d H:i:s');
+
+    $sql1 = 'insert into request_emails'.
+            '(request_log_id, subject, body, outgoing)'.
+            'values'.
+            '(:request_log_id, :subject, :body, :outgoing)';
+    $sql2 = 'insert into request_reminders (request_log_id, next_send_date)'.
+            'values (:request_log_id, :next_send_date)';
+
+    $db = getConnection();
+    $db->beginTransaction();
+    try {
+      $stmt = $db->prepare($sql1);
+      $stmt->bindParam('request_log_id', $params->request_log_id);
+      $stmt->bindParam('subject', $params->subject);
+      $stmt->bindParam('body', $params->body);
+      $stmt->bindParam('outgoing', $params->outgoing);
+      $stmt->execute();
+      $params->id = $db->lastInsertId();
+
+      $stmt = $db->prepare($sql2);
+      $stmt->bindParam('request_log_id', $params->request_log_id);
+      // the next_send_date today is just for the demo
+      $stmt->bindParam('next_send_date', $timestamp);
+      $stmt->execute();
+
+      $db->commit();
+      echo '{"status":"ok"}';
+    } catch (PDOException $e) {
+      $db->rollBack();
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
 
   //////////////////////////////////////////////////////////////////////////
   //

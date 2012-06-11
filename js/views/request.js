@@ -12,7 +12,8 @@ var RequestView = FOIAView.extend({
     'click #new-request input#dateNext': 'save_date',
     'click #new-request input#dateSkip': 'skip_date',
     'click #new-request input#docsNext': 'save_docs',
-    'click #register button': 'register'
+    'click #register button': 'register',
+    'click #request-preview button': 'send_requests'
   },
 
   partials: {
@@ -308,5 +309,27 @@ var RequestView = FOIAView.extend({
       }
     });
   },
+
+  send_requests: function () {
+    var letters = $('#previews .tab-pane');
+    var self = this;
+    _.each(letters, function(element, index, list) {
+      var requestEmail = new RequestEmail({
+        request_log_id: this.model.get('id'),
+        subject: 'Freedom of Information Request',
+        body: $(element).html(),
+        outgoing: 1
+      });
+      requestEmail.save(null, {
+        success: function(model, response) {
+          // TODO send an email to the agency
+          self.alert(true, 'Success!');
+        },
+        error: function() {
+          self.alert(false, 'There was an error sending the requests.');
+        }
+      });
+    }, this);
+  }
 
 });
