@@ -568,13 +568,16 @@
             'values (:request_log_id, :next_send_date)';
 
 	$sql3 = 'update request_log set approved = 1 where id = :request_log_id';
+	
+	$subject_id = ' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']'; 
+	
     $db = getConnection();
     $db->beginTransaction();
     try {
       $stmt = $db->prepare($sql1);
       $stmt->bindParam('request_log_id', $params->request_log_id);
       $stmt->bindParam('agency_id', $params->agency_id);
-      $stmt->bindParam('subject', $params->subject);
+      $stmt->bindParam('subject', $params->subject.$subject_id);
       $stmt->bindParam('body', $params->body);
       $stmt->bindParam('outgoing', $params->outgoing);
       $stmt->execute();
@@ -605,7 +608,7 @@
     $stmt->bindParam('agency_id', $params->agency_id);
     $result = $stmt->query();
     sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'], 
-    	$params->subject, $params->body);
+    	$params->subject.$subject_id, $params->body);
     	
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
