@@ -631,7 +631,9 @@
     $stmt = $db->prepare($sql4);
     $stmt->bindParam('agency_id', $params->agency_id);
     $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
     if(count($results) > 0){
+        $result = $results[0];
         sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
     }
 
