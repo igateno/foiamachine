@@ -592,9 +592,9 @@
     $sql2 = 'insert into request_reminders (request_log_id, next_send_date)'.
             'values (:request_log_id, :next_send_date)';
 
-	$sql3 = 'update request_log set approved = 1 where id = :request_log_id';
+    $sql3 = 'update request_log set approved = 1 where id = :request_log_id';
 
-	$subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']';
+    $subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']';
 
     $db = getConnection();
     $db->beginTransaction();
@@ -614,9 +614,9 @@
       $stmt->bindParam('next_send_date', $timestamp);
       $stmt->execute();
 
-	  $stmt = $db->prepare($sql3);
-	  $stmt->bindParam('request_log_id', $params->request_log_id);
-	  $stmt->execute();
+      $stmt = $db->prepare($sql3);
+      $stmt->bindParam('request_log_id', $params->request_log_id);
+      $stmt->execute();
 
       $db->commit();
       echo '{"status":"ok"}';
@@ -636,10 +636,11 @@
         $result = $results[0];
         sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
     }
+
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
-	$stmt->bindParam('request_log_id', $params->request_log_id);
-	$stmt->execute();
+    $stmt->bindParam('request_log_id', $params->request_log_id);
+    $stmt->execute();
 
     $db = null;
   }

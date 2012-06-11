@@ -24,11 +24,9 @@ var FOIARouter = Backbone.Router.extend({
   },
 
   login: function() {
-    if (!this.loginView) {
-      var session = new Session();
-      this.loginView = new LoginView({model:session});
-      this.loginView.render();
-    }
+    var session = new Session();
+    this.loginView = new LoginView({model:session});
+    this.loginView.render();
     $('#container').html(this.loginView.el);
   },
 
