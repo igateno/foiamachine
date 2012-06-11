@@ -107,17 +107,16 @@
 	     	  $index1 = strpos($sub, 'foiaid:') + strlen('foiaid:');
 	     	  $index2 = strpos($sub, '-', index1);
 	     	  $request_log_id = intval(substr($sub, $index1, $index2 - $index1));
-	     	  $agency_id = intval(substr($sub, $index2+1, strlen($sub) - $index2 - 2));
-		  
+	     	  $agency_id = intval(substr($sub, $index2+1, strlen($sub) - $index2 - 2));		  
 	     	  $from = $overview[0]->from;
 	     	  $sql = 'select U.email as user_email from users U, request_log R, request_log_agencies RA  
 		       where R.id = :request_log_id and R.id = RA.request_log_id and 
 		       RA.agency_id = :agency_id and R.user_id = U.id';
 	     	  $db = getConnection();
 	     	  $stmt = $db->prepare($sql);
-		  $stmt->bindParam('request_log_id', $request_log_id);
-		  $stmt->bindParam('agency_id', $agency_id);
-		  $stmt->execute();
+		  	  $stmt->bindParam('request_log_id', $request_log_id);
+		  	  $stmt->bindParam('agency_id', $agency_id);
+		      $stmt->execute();
     		  $results = $stmt->fetchAll(PDO::FETCH_OBJ);
     		  $result = $results[0];
 	     	  sendMail($from, $result->user_email, $sub, $body);

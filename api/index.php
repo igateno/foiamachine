@@ -634,7 +634,7 @@
     if(count($results) > 0){
         sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
     }
-
+    
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
 	$stmt->bindParam('request_log_id', $params->request_log_id);
