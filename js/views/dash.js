@@ -5,12 +5,12 @@ var ViewRequestView = FOIAView.extend({
   },
 
   events: {
-    'click button.back':'back'
-    // TODO make it so that when you click on a header you see the body
+    'click button.back':'back',
+    'click #email-headers tr':'viewBody'
   },
 
   partials: {
-    row: '<tr><td><%= from %></td><td><%= to %></td><td><%= subject %></td><td><%= date %></td></tr>'
+    row: '<tr data-id="<%= id %>"><td><%= from %></td><td><%= to %></td><td><%= subject %></td><td><%= date %></td></tr>'
   },
 
   render: function() {
@@ -35,6 +35,7 @@ var ViewRequestView = FOIAView.extend({
     _.each(this.model.get('emails'), function(element, index, list) {
       var row = _.template(this.partials.row);
       $('#email-headers tbody').append(row({
+        id: element.id,
         from: element.outgoing ? $.cookie('username') : element.agency,
         to: element.outgoing ? element.agency : $.cookie('username'),
         subject: element.subject,
@@ -46,6 +47,28 @@ var ViewRequestView = FOIAView.extend({
   back: function (e) {
     e.preventDefault();
     app.navigate('dash', {trigger: true});
+  },
+
+  bodyForId: function (id) {
+    var result = null;
+    _.each(this.model.get('emails'), function(element, index, list) {
+      if (element.id == id) {
+        result = element.body;
+      }
+    }, this);
+    return result;
+  },
+
+  viewBody: function (e) {
+    e.preventDefault();
+    var id = $(e.target).parent().attr('data-id');
+    var body = this.bodyForId(id);
+    if (!body) {
+      this.alert(false, 'There seems to be something wrong.');
+      return;
+    }
+    var template = _.template(body);
+    $('#email-body').html(template());
   }
 
 });
