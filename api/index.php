@@ -619,12 +619,15 @@
       $stmt->execute();
 
       $db->commit();
+      $db = null;
       echo '{"status":"ok"}';
     } catch (PDOException $e) {
       $db->rollBack();
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
+
+    $db = getConnection();
 
     $sql4 = 'select email from agency_data where agency_id = :agency_id';
 
@@ -634,10 +637,13 @@
     $results = $stmt->fetchAll(PDO::FETCH_OBJ);
     if(count($results) > 0){
         $result = $results[0];
-        sendMail('requestengine@foiamachine.org', $result->email, $subject, $params->body);
+        sendMail('requestengine@foiamachine.org',
+                 $result->email, $subject,
+                 $params->body);
     }
 
-    $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
+    $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP'.
+            'where id = :request_log_id';
     $stmt = $db->prepare($sql5);
     $stmt->bindParam('request_log_id', $params->request_log_id);
     $stmt->execute();
