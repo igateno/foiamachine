@@ -6,13 +6,41 @@ var ViewRequestView = FOIAView.extend({
 
   events: {
     'click button.back':'back'
+    // TODO make it so that when you click on a header you see the body
+  },
+
+  partials: {
+    row: '<tr><td><%= from %></td><td><%= to %></td><td><%= subject %></td><td><%= date %></td></tr>'
   },
 
   render: function() {
     $(this.el).html(this.template({
       id: this.model.get('id')
     }));
+
+    var self = this;
+    this.model.fetchEmails({
+      success: function() {
+        self.populate();
+      },
+      error: function () {
+        self.alert(false, 'There was an error loading the page');
+      }
+    });
+
     return this;
+  },
+
+  populate: function() {
+    _.each(this.model.get('emails'), function(element, index, list) {
+      var row = _.template(this.partials.row);
+      $('#email-headers tbody').append(row({
+        from: element.outgoing ? $.cookie('username') : element.agency,
+        to: element.outgoing ? element.agency : $.cookie('username'),
+        subject: element.subject,
+        date: element.date
+      }));
+    }, this);
   },
 
   back: function (e) {
@@ -29,7 +57,8 @@ var DashView = FOIAView.extend({
   },
 
   events: {
-    'click #request-menu table tr': 'viewRequest'
+    'click #request-menu table tr': 'viewRequest',
+    'click button.new-request':'newRequest'
   },
 
   partials: {
@@ -70,6 +99,11 @@ var DashView = FOIAView.extend({
     e.preventDefault();
     var id = $(e.target).parent().attr('data-id');
     app.navigate('request/'+id, {trigger: true});
+  },
+
+  newRequest: function(e) {
+    e.preventDefault();
+    app.navigate('', {trigger: true});
   }
 
 });

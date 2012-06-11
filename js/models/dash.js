@@ -5,6 +5,21 @@ var ViewRequestModel = Backbone.Model.extend({
       username: $.cookie('username'),
       token: $.cookie('token')
     }
+  },
+
+  fetchEmails: function(callbacks) {
+    var self = this;
+    $.ajax({
+      url: 'api/viewRequest',
+      type: 'POST',
+      data: JSON.stringify(this),
+      dataType: 'json'
+    }).done(function(results) {
+      self.set('emails', results);
+      callbacks.success();
+    }).fail(function() {
+      callbacks.error();
+    });
   }
 
 });

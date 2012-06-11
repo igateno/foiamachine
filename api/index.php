@@ -40,6 +40,7 @@
 
   // Request Emails
   $app->post('/requestEmails', 'addRequestEmail');
+  $app->post('/viewRequest', 'getRequestEmails');
 
   $app->run();
 
@@ -614,6 +615,32 @@
       echo '{"status":"ok"}';
     } catch (PDOException $e) {
       $db->rollBack();
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error":{"text":'.$e->getMessage().'}}';
+    }
+  }
+
+  function getRequestEmails() {
+    $id = validateToken();
+    if (!$id) {
+      header('HTTP/1.0 420 Enhance Your Calm', true, 420);
+      echo '{"error": "invalid token"}';
+      return;
+    }
+
+    $request = Slim::getInstance()->request();
+    $params = json_decode($request->getBody());
+
+    $sql = file_get_contents('../db/queries/request_emails.sql');
+
+    try {
+      $db = getConnection();
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam('request_log_id', $params->id);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_OBJ);
+      echo json_encode($results);
+    } catch (PDOException $e) {
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
