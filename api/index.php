@@ -591,4 +591,15 @@
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
+    
+    sql3 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where 
+    		E.id = :agency_id and AD.agency_id = :agency_id';
+    		
+    $stmt = $db->prepare($sql3);
+    $stmt->bindParam('agency_id', $params->agency_id);
+    $result = $stmt->query();
+    sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'], 
+    	$params->subject, $params->body);
+    		
+    $db = null;
   }
