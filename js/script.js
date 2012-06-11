@@ -6,7 +6,7 @@ var FOIARouter = Backbone.Router.extend({
     '':'login',
     'login':'login',
     'dash':'dashboard',
-    'forms':'forms',
+    'request/:id':'viewRequest'
   },
 
   initialize: function() {
@@ -34,23 +34,18 @@ var FOIARouter = Backbone.Router.extend({
 
   dashboard: function() {
     this.assertAuth(function() {
-      if (!this.dashView) {
-        var dashModel = new DashModel()
-        this.dashView = new DashView({model: dashModel});
-        this.dashView.render();
-      }
+      var dashModel = new DashModel();
+      this.dashView = new DashView({model: dashModel});
+      this.dashView.render();
       $('#container').html(this.dashView.el);
     });
   },
 
-  forms: function(tab) {
+  viewRequest: function (id) {
     this.assertAuth(function() {
-      if (!this.formsView) {
-        this.formsView = new FormsView();
-        this.formsView.render();
-      }
-      $('#container').html(this.formsView.el);
-      this.formsView.populate();
+      this.viewRequestView = new ViewRequestView();
+      this.viewRequestView.render();
+      $('#container').html(this.viewRequestView.el);
     });
   }
 
@@ -59,6 +54,7 @@ var FOIARouter = Backbone.Router.extend({
 var templates = [
   'header',
   'request-carousel',
+  'view_request',
   'letters/us',
   'letters/serbia-english',
   'agency-tab',

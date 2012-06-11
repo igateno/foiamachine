@@ -1,4 +1,5 @@
 select
+  rl.id as id,
   e1.name as country,
   e2.name as topic,
   rl.question as question
