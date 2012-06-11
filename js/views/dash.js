@@ -5,12 +5,12 @@ var ViewRequestView = FOIAView.extend({
   },
 
   events: {
-    'click button.back':'back'
-    // TODO make it so that when you click on a header you see the body
+    'click button.back':'back',
+    'click #email-headers tr':'viewBody'
   },
 
   partials: {
-    row: '<tr><td><%= from %></td><td><%= to %></td><td><%= subject %></td><td><%= date %></td></tr>'
+    row: '<tr data-id="<%= id %>"><td><%= from %></td><td><%= to %></td><td><%= subject %></td><td><%= date %></td></tr>'
   },
 
   render: function() {
@@ -35,6 +35,7 @@ var ViewRequestView = FOIAView.extend({
     _.each(this.model.get('emails'), function(element, index, list) {
       var row = _.template(this.partials.row);
       $('#email-headers tbody').append(row({
+        id: element.id,
         from: element.outgoing ? $.cookie('username') : element.agency,
         to: element.outgoing ? element.agency : $.cookie('username'),
         subject: element.subject,
@@ -46,6 +47,28 @@ var ViewRequestView = FOIAView.extend({
   back: function (e) {
     e.preventDefault();
     app.navigate('dash', {trigger: true});
+  },
+
+  bodyForId: function (id) {
+    var result = null;
+    _.each(this.model.get('emails'), function(element, index, list) {
+      if (element.id == id) {
+        result = element.body;
+      }
+    }, this);
+    return result;
+  },
+
+  viewBody: function (e) {
+    e.preventDefault();
+    var id = $(e.target).parent().attr('data-id');
+    var body = this.bodyForId(id);
+    if (!body) {
+      this.alert(false, 'There seems to be something wrong.');
+      return;
+    }
+    var template = _.template(body);
+    $('#email-body').html(template());
   }
 
 });
@@ -58,7 +81,9 @@ var DashView = FOIAView.extend({
 
   events: {
     'click #request-menu table tr': 'viewRequest',
-    'click button.new-request':'newRequest'
+    'click button.new-request':'newRequest',
+    'click a.add-agency':'newAgency',
+    'click a.add-relation':'newRelation'
   },
 
   partials: {
@@ -104,6 +129,22 @@ var DashView = FOIAView.extend({
   newRequest: function(e) {
     e.preventDefault();
     app.navigate('', {trigger: true});
+  },
+
+  newAgency: function(e) {
+    e.preventDefault();
+    var agency = new Agency();
+    var agencyFormView = new AgencyFormView({model: agency});
+    $('#new-agency').html(agencyFormView.render().el);
+    $('#agency-modal').modal('show');
+  },
+
+  newRelation: function(e) {
+    e.preventDefault();
+    var relation = new CCRelation({type: 1});
+    var ccFormView = new CCFormView({model: relation});
+    $('#new-cc-relation').html(ccFormView.render().el);
+    $('#cc-modal').modal('show');
   }
 
 });

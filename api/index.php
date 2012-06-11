@@ -27,9 +27,7 @@
   $app->get('/doctypes', 'getDoctypes');
 
   // Relations
-  $app->get('/ccRelations', 'getCCRelations');
   $app->post('/ccRelations', 'addCCRelation');
-  $app->get('/catRelations', 'getCATRelations');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');
@@ -595,9 +593,9 @@
             'values (:request_log_id, :next_send_date)';
 
 	$sql3 = 'update request_log set approved = 1 where id = :request_log_id';
-	
-	$subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']'; 
-	
+
+	$subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']';
+
     $db = getConnection();
     $db->beginTransaction();
     try {
@@ -615,11 +613,11 @@
       // the next_send_date today is just for the demo
       $stmt->bindParam('next_send_date', $timestamp);
       $stmt->execute();
-	  
+
 	  $stmt = $db->prepare($sql3);
 	  $stmt->bindParam('request_log_id', $params->request_log_id);
 	  $stmt->execute();
-	  
+
       $db->commit();
       echo '{"status":"ok"}';
     } catch (PDOException $e) {
@@ -627,22 +625,20 @@
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
-    
-    $sql4 = 'select AD.email as email from agency_data AD where 
-    	  AD.agency_id = :agency_id';
-    		
+
+    $sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where
+    		E.id = :agency_id and AD.agency_id = :agency_id';
+
     $stmt = $db->prepare($sql4);
     $stmt->bindParam('agency_id', $params->agency_id);
-    $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_OBJ);
-    $result = $results[0];
-    sendMail('requestengine@foiamachine.org', $result->email, 
-    	$subject, $params->body);
-    	
+    $result = $stmt->query();
+    sendMail('requestengine@foiamachine.org', $result['email'], 'FOIA Machine', $result['agency'],
+    	$params->subject.$subject_id, $params->body);
+
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
-    $stmt->bindParam('request_log_id', $params->request_log_id);
-    $stmt->execute();
+	$stmt->bindParam('request_log_id', $params->request_log_id);
+	$stmt->execute();
 
     $db = null;
   }
