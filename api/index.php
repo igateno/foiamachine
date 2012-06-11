@@ -597,7 +597,8 @@
     $subject = $params->subject .' [foiaid:'.$params->request_log_id.'-'.$params->agency_id.']';
 
     $db = getConnection();
-    $db->beginTransaction();
+    // TODO fix deadlock
+    //$db->beginTransaction();
     try {
       $stmt = $db->prepare($sql1);
       $stmt->bindParam('request_log_id', $params->request_log_id);
@@ -618,11 +619,11 @@
       $stmt->bindParam('request_log_id', $params->request_log_id);
       $stmt->execute();
 
-      $db->commit();
+      //$db->commit();
       $db = null;
       echo '{"status":"ok"}';
     } catch (PDOException $e) {
-      $db->rollBack();
+      //$db->rollBack();
       header('HTTP/1.0 420 Enhance Your Calm', true, 420);
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
@@ -642,7 +643,7 @@
                  $params->body);
     }
 
-    $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP'.
+    $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP '.
             'where id = :request_log_id';
     $stmt = $db->prepare($sql5);
     $stmt->bindParam('request_log_id', $params->request_log_id);

@@ -36,8 +36,8 @@ var ViewRequestView = FOIAView.extend({
       var row = _.template(this.partials.row);
       $('#email-headers tbody').append(row({
         id: element.id,
-        from: element.outgoing ? $.cookie('username') : element.agency,
-        to: element.outgoing ? element.agency : $.cookie('username'),
+        from: element.outgoing == 1 ? $.cookie('username') : element.agency,
+        to: element.outgoing == 1 ? element.agency : $.cookie('username'),
         subject: element.subject,
         date: element.date
       }));
