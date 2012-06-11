@@ -324,8 +324,7 @@ var RequestView = FOIAView.extend({
       });
       requestEmail.save(null, {
         success: function(model, response) {
-          // TODO send an email to the agency
-          self.alert(true, 'Success!');
+          app.navigate('dash', {trigger: true});
         },
         error: function() {
           self.alert(false, 'There was an error sending the requests.');
