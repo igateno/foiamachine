@@ -28,10 +28,19 @@
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a class="add-agency">New Agency</a></li>
+          <li><a data-target="#agency-modal" data-toggle="modal">New Agency</a></li>
           <li><a class="add-relation">New Country-Country</a></li>
         </ul>
       </div> <!-- btn-group -->
     </div>
   </div> <!-- span3 -->
+</div>
+
+<div class="modal hide" id="agency-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">x</button>
+    <h1>New Agency</h1>
+  </div> <!-- modal-header -->
+  <div id="new-agency">
+  </div>
 </div>
