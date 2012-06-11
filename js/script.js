@@ -63,7 +63,6 @@ var templates = [
   'agency-checkbox',
   'dashboard',
   'login',
-  'forms',
   'entity-item',
   'relation-item'
 ];
