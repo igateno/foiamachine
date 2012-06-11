@@ -43,7 +43,8 @@ var FOIARouter = Backbone.Router.extend({
 
   viewRequest: function (id) {
     this.assertAuth(function() {
-      this.viewRequestView = new ViewRequestView();
+      var viewRequestModel = new ViewRequestModel({id: id});
+      this.viewRequestView = new ViewRequestView({model: viewRequestModel});
       this.viewRequestView.render();
       $('#container').html(this.viewRequestView.el);
     });

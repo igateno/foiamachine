@@ -4,9 +4,20 @@ var ViewRequestView = FOIAView.extend({
     this.template = _.template(tpl.get('view_request'));
   },
 
+  events: {
+    'click button.back':'back'
+  },
+
   render: function() {
-    $(this.el).html(this.template());
+    $(this.el).html(this.template({
+      id: this.model.get('id')
+    }));
     return this;
+  },
+
+  back: function (e) {
+    e.preventDefault();
+    app.navigate('dash', {trigger: true});
   }
 
 });

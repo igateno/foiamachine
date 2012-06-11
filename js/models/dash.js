@@ -1,3 +1,14 @@
+var ViewRequestModel = Backbone.Model.extend({
+
+  defaults: function() {
+    return {
+      username: $.cookie('username'),
+      token: $.cookie('token')
+    }
+  }
+
+});
+
 var DashModel = Backbone.Model.extend({
 
   defaults: function() {
