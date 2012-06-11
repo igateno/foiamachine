@@ -130,24 +130,35 @@
 	     $seen = $overview[0]->seen;
 	     print $email_number;
 	     print '<br/>';
-	     //if(!$seen){
+	     if(!$seen){
 	     	  $body = imap_fetchbody($mbox, $email_number, 2);
 	     	  $sub = $overview[0]->subject;
+	     	  $index1 = strpos($sub, 'foiaid:') + strlen('foiaid:');
+	     	  $index2 = strpos($sub, '-', index1);
+	     	  $request_log_id = intval($sub, index1, index2 - index1);
+	     	  $agency_id = intval($sub, index2+1, strlen($sub) - index2 + 1);
 	     	  $from = $overview[0]->from;
-		  $info = imap_fetchstructure($mbox, $email_number);
-		  if(count($info->parts) > 1){
-		      foreach($info->parts as $part){
-		      	 if ($part->disposition == "INLINE") {
-			     printf("Inline message has %s lines<BR>", $part->lines);
-			 } elseif ($part->disposition == "ATTACHMENT") {
-			     echo "Attachment found!<br/>";
-			     echo "Filename: ", $part->dparameters[0]->value;
-			     //extractAttachments($mbox, $message, $email_number);
-         		 }
-		      }
-		  }
-		//sendMail('requestengine@foiamachine.org', 'dummy.user@foiamachine.org', 'FOIA Machine', 'Dummy User', $sub, html2text($body));
-	    // }
+	     	  $sql = 'select E.name as agency, U.name as user, U.email as user_email, 
+	     	  		from entities E, users U, request_log R, request_log_agencies RA where
+	     	  		R.id = :request_log_id and R.id = RA.request_log_id and 
+	     	  		RA.agency_id = :agency_id and R.user_id = U.id';
+	     	  $db = getConnection();
+	     	  $stmt = $db->prepare($sql);
+	     	  $result = $stmt->execute();
+	     	  sendMail($from, $result['user_email'], $result['agency'], $result['user'], 
+	     	  		$sub, html2text($body));
+	     	  		
+	     	  $sql2 = 'insert into request_emails 
+	     	  		(request_log_id, agency_id, subject, body, outgoing) 
+		     	  	values(:request_log_id, :agency_id, :subject, :body, 0)';
+		      $stmt->bindParam('request_log_id', $request_log_id);
+		      $stmt->bindParam('agency_id', $agency_id);
+		      $stmt->bindParam('subject', $sub);
+		      $stmt->bindParam('body', $body);
+			  $stmt->execute();
+		     	  	
+	     	  updateDatabase();
+	     }
 	  }
        }
        imap_close($mbox);
