@@ -590,7 +590,7 @@
       $stmt->execute();
 	  
 	  $stmt = $db->prepare($sql3);
-	  $stmt->bindParam('request_log_id', params->request_log_id);
+	  $stmt->bindParam('request_log_id', $params->request_log_id);
 	  $stmt->execute();
 	  
       $db->commit();
@@ -601,7 +601,7 @@
       echo '{"error":{"text":'.$e->getMessage().'}}';
     }
     
-    sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where 
+    $sql4 = 'select AD.email as email, E.name as agency from entities E, agency_data AD where 
     		E.id = :agency_id and AD.agency_id = :agency_id';
     		
     $stmt = $db->prepare($sql4);
@@ -612,7 +612,7 @@
     	
     $sql5 = 'update request_log set sent = CURRENT_TIMESTAMP where id = :request_log_id';
     $stmt = $db->prepare($sql5);
-	$stmt->bindParam('request_log_id', params->request_log_id);
+	$stmt->bindParam('request_log_id', $params->request_log_id);
 	$stmt->execute();
 	
     $db = null;
