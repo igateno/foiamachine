@@ -1,45 +1,156 @@
 <?php
+	
+    require 'mailer.php';
+    $attachmentDir = "/home/foiamachine/documents/";
 
-    require_once "ezc/Base/src/base.php";
-    function __autoload( $className )
+    /* adapted from http://www.daniweb.com/web-development/php/threads/113444/php-imap-save-attachment-and-email */
+    function getDecodeValue($message,$coding) {
+       switch($coding) {
+          case 0:
+	  case 1:
+	       $message = imap_8bit($message);
+	       break;
+	  case 2:
+	       $message = imap_binary($message);
+	       break;
+          case 3:
+	  case 5:
+	       $message = imap_base64($message);
+	       break;
+	  case 4:
+	       $message = imap_qprint($message);
+	       break;
+       }
+
+       return $message;
+    }
+
+    /* extracts attachments and writes to files with the name of the attachment: part of the code 
+       adapted from 
+       http://www.daniweb.com/web-development/php/threads/113444/php-imap-save-attachment-and-email 
+       */ 
+    function extractAttachments($mbox, $message, $email_number){	 
+    	 $attachments = array();
+	 $structure = imap_fetchstructure($mbox, $email_number, FT_UID);
+	 $parts = $structure->parts;
+	 $fpos = 2;
+	 for($i = 0; $i < count($parts); $i++){
+	     $message['pid'][$i] = ($i);
+	     $part = $parts[$i];
+	     if($part->disposition == "ATTACHMENT"){
+		 $message["type"][$i] = $message["attachment"]["type"][$part->type] . "/" . strtolower($part->subtype);
+		 $message["subtype"][$i] = strtolower($part->subtype);
+		 $ext=$part->subtype; 
+		 $params = $part->dparameters; 
+		 $filename = $part->dparameters[0]->value;
+		 $mege = ""; 
+		 $data = ""; 
+		 $mege = imap_fetchbody($mbox,$jk,$fpos); 
+		 $filename = "$filename";
+		 $fp = fopen($savedir.$filename,w);
+		 $data=getDeecodeValue($mege,$part->type); 
+		 fputs($fp,$data); 
+		 fclose($fp);
+		 $fpos+=1;
+	     }
+	 }
+    }
+  
+    /* adapted fro http://sb2.info/php-script-html-plain-text-convert */
+    function html2text($html)
     {
-        ezcBase::autoload( $className );
+	$tags = array (
+   	       0 => '~<h[123][^>]+>~si',
+	       1 => '~<h[456][^>]+>~si',
+  	       2 => '~<table[^>]+>~si',
+    	       3 => '~<tr[^>]+>~si',
+    	       4 => '~<li[^>]+>~si',
+    	       5 => '~<br[^>]+>~si',
+    	       6 => '~<p[^>]+>~si',
+	       7 => '~<div[^>]+>~si',
+    	       );
+	 
+	 $html = preg_replace($tags,"\n",$html);
+	 $html = preg_replace('~</t(d|h)>\s*<t(d|h)[^>]+>~si',' - ',$html);
+    	 $html = preg_replace('~<[^>]+>~s','',$html);
+    
+	 // reducing spaces
+    	 $html = preg_replace('~ +~s',' ',$html);
+    	 $html = preg_replace('~^\s+~m','',$html);
+    	 $html = preg_replace('~\s+$~m','',$html);
+    	 
+	 // reducing newlines
+    	 $html = preg_replace('~\n+~s',"\n",$html);
+    	 return $html;
     }
 
-    function sendEMail($from_email, $to_email, $from_name, $to_name, $subject, $body){    
-       $mail = new ezcMailComposer();
-       $mail->from = new ezcMailAddress( $from_email, $from_name );
-       $mail->addTo( new ezcMailAddress( $to_email, $to_name ) );
-       $mail-> subject = $subject;
-       $mail->plainText = $body;
-       $mail->build();
-       $transport = new ezcMailMtaTransport();
-       $transport->send($mail);
-    }
-
-    function receiveMail(){
-       $server = '{imap.gmail.com:993/imap/ssl}INBOX';
-       $user='requestengine@foiamachine.org';
-       $pass='foiamachine';
-       $mbox = imap_open( $server, $user, $pass );
-       $sorted_mbox = imap_sort($mbox, SORTDATE, 0);
-       $totalrows = imap_num_msg($mbox);
-       
-       $five_minutes_earlier = time() - 5*60;
-       $messagenum = 0;
-       while ($messagenum < $totalrows) {
-          $headers = imap_fetchheader($mbox, $sorted_mbox[ $messagenum ] );
-          $subject = array();
-          preg_match_all('/^Subject: (.*)/m', $headers, $subject);
-          $sub = $subject[$messagenum + 1][0];
-	  $body = imap_body($mbox, $messagenum + 1);
-	  $header = imap_header($mbox, $messagenum + 1);                      
-          if($header->udate > $five_minutes_earlier){
-	      sendEmail('requestengine@foiamachine.org', 'dummy.user@foiamachine.org', 'FOIA Machine', 'Dummy User', $subject, $body);
+    function existAttachment($part){
+       if(isset($part->parts)){
+          foreach($part->parts as $partOfPart){
+	      existAttachment($partOfPart);
 	  }
-          $messagenum++;
+       }else{
+	  if(isset($part->disposition)){
+	     if($part->disposition == 'attachment'){
+	     	return true;
+	     }
+	  }
        }
     }
 
+    function receiveMail(){
+       $host = '{imap.gmail.com:993/imap/ssl}inbox';
+       $login = 'requestengine@foiamachine.org';
+       $password = 'foiamachine';
+
+       $mbox = imap_open( $host, $login, $password ) or die ('Cannot connect to Gmail: ' . imap_last_error());
+       $emails = imap_search($mbox, 'ALL');
+
+       $attachmentDir = str_replace('\\', '/', $attachmentDir);
+       if(substr($attachmentDir, strlen($attachmentDir) -1) != '/'){
+          $attachmentDir .= '/';
+       }
+
+       if($emails){
+          $message = array();
+       	  $message['attachment']['type'][0] = 'text';
+       	  $message['attachment']['type'][1] = 'multipart';
+       	  $message['attachment']['type'][2] = 'message';
+       	  $message['attachment']['type'][3] = 'application';
+       	  $message['attachment']['type'][4] = 'image';
+       	  $message['attachment']['type'][5] = 'audio';
+       	  $message['attachment']['type'][6] = 'video';
+       	  $message['attachment']['type'][7] = 'other';
+
+	  rsort($emails);
+	  foreach($emails as $email_number){
+	     $overview = imap_fetch_overview($mbox, $email_number, 0);
+	     /* extract request id from the subject */
+
+	     $seen = $overview[0]->seen;
+	     print $email_number;
+	     print '<br/>';
+	     //if(!$seen){
+	     	  $body = imap_fetchbody($mbox, $email_number, 2);
+	     	  $sub = $overview[0]->subject;
+	     	  $from = $overview[0]->from;
+		  $info = imap_fetchstructure($mbox, $email_number);
+		  if(count($info->parts) > 1){
+		      foreach($info->parts as $part){
+		      	 if ($part->disposition == "INLINE") {
+			     printf("Inline message has %s lines<BR>", $part->lines);
+			 } elseif ($part->disposition == "ATTACHMENT") {
+			     echo "Attachment found!<br/>";
+			     echo "Filename: ", $part->dparameters[0]->value;
+			     //extractAttachments($mbox, $message, $email_number);
+         		 }
+		      }
+		  }
+		//sendMail('requestengine@foiamachine.org', 'dummy.user@foiamachine.org', 'FOIA Machine', 'Dummy User', $sub, html2text($body));
+	    // }
+	  }
+       }
+       imap_close($mbox);
+    }
     receiveMail();
 ?>
