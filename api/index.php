@@ -27,9 +27,7 @@
   $app->get('/doctypes', 'getDoctypes');
 
   // Relations
-  $app->get('/ccRelations', 'getCCRelations');
   $app->post('/ccRelations', 'addCCRelation');
-  $app->get('/catRelations', 'getCATRelations');
 
   // Entities and Relations tables
   $app->post('/agencyTabs', 'agencyTabs');

@@ -45,6 +45,15 @@
   </div>
 </div>
 
+<div class="modal hide" id="cc-modal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">x</button>
+    <h1>New Country-Country</h1>
+  </div> <!-- modal-header -->
+  <div id="new-cc-relation">
+  </div>
+</div>
+
 <script id="new-agency-template" type="text/template">
   <div class="modal-body">
     <form class="new-agency">
@@ -74,5 +83,26 @@
   </div>
   <div class="modal-footer">
     <button class="btn">Add Agency</button>
+  </div>
+</script>
+
+<script id="cc-template" type="text/template">
+  <div class="modal-body">
+    <form>
+      <fieldset>
+        <input class="country c1"
+               type="text"
+               data-provide="typeahead"
+               placeholder="Country">
+        <p>knows about</p>
+        <input class="country c2"
+               type="text"
+               data-provide="typeahead"
+               placeholder="Country">
+      </fieldset>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn">Add Relation</button>
   </div>
 </script>

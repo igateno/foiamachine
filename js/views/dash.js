@@ -82,7 +82,8 @@ var DashView = FOIAView.extend({
   events: {
     'click #request-menu table tr': 'viewRequest',
     'click button.new-request':'newRequest',
-    'click a.add-agency':'newAgency'
+    'click a.add-agency':'newAgency',
+    'click a.add-relation':'newRelation'
   },
 
   partials: {
@@ -136,6 +137,14 @@ var DashView = FOIAView.extend({
     var agencyFormView = new AgencyFormView({model: agency});
     $('#new-agency').html(agencyFormView.render().el);
     $('#agency-modal').modal('show');
+  },
+
+  newRelation: function(e) {
+    e.preventDefault();
+    var relation = new CCRelation({type: 1});
+    var ccFormView = new CCFormView({model: relation});
+    $('#new-cc-relation').html(ccFormView.render().el);
+    $('#cc-modal').modal('show');
   }
 
 });

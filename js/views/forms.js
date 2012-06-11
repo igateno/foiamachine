@@ -1,103 +1,3 @@
-var CCTableView = FOIAView.extend({
-
-  partials: {
-    row: '<tr><td><%= name1 %></td><td>knows about</td><td><%= name2 %></td></tr>'
-  },
-
-  render: function() {
-    if (!this.model) {
-      this.alert(false, 'Error displaying the page.');
-      return;
-    }
-
-    var self = this;
-    this.model.fetch({
-      success: function (model, response) {
-        _.each(response, function (element, index, list) {
-          var template = _.template(this.partials.row);
-          $('#relations .cc tbody').append(template({
-            name1: element.name1,
-            name2: element.name2
-          }));
-        }, self);
-      },
-      error: function () {
-        this.alert(false, 'Error displaying the page.');
-      }
-    });
-  }
-
-});
-
-var CATTableView = FOIAView.extend({
-
-  partials: {
-    row: '<tr><td><%= country %></td><td><%= agency %></td><td><%= topic %></td></tr>'
-  },
-
-  render: function() {
-    if (!this.model) {
-      this.alert(false, 'Error displaying the page.');
-      return;
-    }
-
-    var self = this;
-    this.model.fetch({
-      success: function (model, response) {
-        _.each(response, function(element, index, list) {
-          var template = _.template(this.partials.row);
-          $('#relations .cat tbody').append(template({
-            country: element.country,
-            agency: element.agency,
-            topic: element.topic
-          }));
-        }, self);
-      },
-      error: function() {
-        this.alert(false, 'Error displaying the page.');
-      }
-    });
-  }
-
-});
-
-var EntityTableView = FOIAView.extend({
-
-  initialize: function() {
-    this.template = _.template($('#etable-template').html());
-  },
-
-  partials: {
-    row: '<tr><td><%= id %></td><td><%= name %></td></tr>'
-  },
-
-  render: function() {
-    $(this.el).html(this.template());
-
-    if (!this.model) {
-      this.alert(false, 'Error displaying the page.');
-    }
-
-    var self = this;
-    this.model.fetch({
-      success: function(model, response) {
-        _.each(response, function (element, index, list) {
-          var template = _.template(this.partials.row);
-          this.$('tbody').append(template({
-            id: element.id,
-            name: element.name
-          }));
-        }, self);
-      },
-      error: function() {
-        this.alert(false, 'Error displaying the page.');
-      }
-    });
-
-    return this;
-  }
-});
-
 var AgencyFormView = FOIAView.extend({
 
   initialize: function() {
@@ -269,8 +169,7 @@ var CCFormView = FOIAView.extend({
   },
 
   events: {
-    'click #new-cc-relation a.add-cc':'addCountryCountry',
-    'keypress #new-cc-relation input.country':'addCountryCountryEnter'
+    'click #new-cc-relation button':'addCountryCountry'
   },
 
   render: function() {
@@ -324,69 +223,6 @@ var CCFormView = FOIAView.extend({
       }
     }
     );
-  },
-
-  addCountryCountryEnter: function(e) {
-    if (e.keyCode == 13) this.addCountryCountry(e);
   }
-
-});
-
-var FormsView = Backbone.View.extend({
-
-  initialize: function() {
-    this.template = _.template(tpl.get('forms'));
-  },
-
-  render: function() {
-    $(this.el).addClass('row-fluid').html(this.template());
-    return this;
-  },
-
-  populate: function() {
-
-    // These populate forms for new entities
-    if (!this.agencyFormView) {
-      var agency = new Agency();
-      this.agencyFormView = new AgencyFormView({model:agency});
-    }
-    $('#new-agency').append(this.agencyFormView.render().el);
-
-    // These populate forms for new relations
-    if (!this.ccFormView) {
-      var relation = new CCRelation({type: 1});
-      this.ccFormView = new CCFormView({model: relation});
-    }
-    $('#new-cc-relation').append(this.ccFormView.render().el);
-
-    // These populate the database lookup tables for entities
-    if (!this.countryTableView) {
-      var countries = new CountryCollection();
-      this.countryTableView = new EntityTableView({model: countries});
-    }
-    $('#entities .country-table').html(this.countryTableView.render().el);
-    if (!this.agencyTableView) {
-      var agencies = new AgencyCollection();
-      this.agencyTableView = new EntityTableView({model: agencies});
-    }
-    $('#entities .agency-table').html(this.agencyTableView.render().el);
-    if (!this.topicTableView) {
-      var topics = new TopicCollection();
-      this.topicTableView = new EntityTableView({model: topics});
-    }
-    $('#entities .topic-table').html(this.topicTableView.render().el);
-
-    // These populate the database lookup tables for relations
-    if (!this.ccTableView) {
-      var ccCollection = new CCRelationCollection();
-      this.ccTableView = new CCTableView({model: ccCollection});
-    }
-    this.ccTableView.render();
-    if (!this.catTableView) {
-      var catCollection = new CATCollection();
-      this.catTableView = new CATTableView({model: catCollection});
-    }
-    this.catTableView.render();
-  },
 
 });
