@@ -35,7 +35,8 @@ var FOIARouter = Backbone.Router.extend({
   dashboard: function() {
     this.assertAuth(function() {
       if (!this.dashView) {
-        this.dashView = new DashView();
+        var dashModel = new DashModel()
+        this.dashView = new DashView({model: dashModel});
         this.dashView.render();
       }
       $('#container').html(this.dashView.el);
