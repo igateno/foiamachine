@@ -590,7 +590,7 @@
       $stmt->execute();
 	  
 	  $stmt = $db->prepare($sql3);
-	  $stmt->bindParam('request_log_id', params->request_log_id);
+	  $stmt->bindParam('request_log_id', $params->request_log_id);
 	  $stmt->execute();
 	  
       $db->commit();
