@@ -103,6 +103,7 @@
 	     $seen = $overview[0]->seen;
 	     if(!$seen){
 	     	  $body = imap_fetchbody($mbox, $email_number, 2);
+	     	  $body = base64_decode($body);
 	     	  $sub = $overview[0]->subject;
 	     	  $index1 = strpos($sub, 'foiaid:') + strlen('foiaid:');
 	     	  $index2 = strpos($sub, '-', index1);
