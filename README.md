@@ -2,7 +2,7 @@
 
 **UPDATE:** This project is stale. Development for the
 [FOIA Machine](www.foiamachine.org) project is ongoing at
-[github.com/cirlabs](github.com/cirlabs). Source code is not public yet, but it
+[github.com/cirlabs](https://github.com/cirlabs). Source code is not public yet, but it
 will be soon!
 
 The FOIA Machine is a Stanford CS194 Senior Project, in collaboration with two
